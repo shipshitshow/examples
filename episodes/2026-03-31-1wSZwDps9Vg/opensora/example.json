@@ -7,7 +7,7 @@
   "license": "reuse terms pending; third-party materials retain their own terms",
   "verification": {
     "secret_scan": "no findings in audited candidate/history; bounded coverage",
-    "runtime": "pending focused checks"
+    "runtime": "Studio 2026-10-02, supported Node 22: npm ci --ignore-scripts failed on eslint@9 / eslint-plugin-react-hooks@4 peer conflict. API build not reached. Historical source retained; no force install or hosted service calls."
   },
   "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
 }

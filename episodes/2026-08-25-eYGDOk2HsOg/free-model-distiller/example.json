@@ -7,7 +7,7 @@
   "license": "reuse terms pending; third-party materials retain their own terms",
   "verification": {
     "secret_scan": "no findings in audited candidate/history; bounded coverage",
-    "runtime": "pending focused checks"
+    "runtime": "Studio 2026-10-02: codex variant npm test passed (12 mocked/offline tests). Root, muse and oxalpha variants remain unverified; no paid model/API calls performed."
   },
   "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
 }

@@ -7,3 +7,7 @@ The exact original prompts were not located and remain labelled missing. OpenSor
 Code reuse license awaits the owner's choice. Existing fonts, textures, sprites, portraits and third-party marks are not granted new rights by a code license. Preserve original attribution/notices and record verified provenance separately. Historical original documentation is retained so corrections do not erase evidence.
 
 Publication excludes `.env*`, private experiment folders, dependencies and media. Placeholder configuration is stored as `config/environment*.example`; it contains no supplied credentials. Required hosted-service keys and possible costs are documented per example. No billing/webhook/cloud action is part of verification.
+
+## Focused verification — October 2, 2026
+
+On Studio, AgentFlowDebugger, PocketCAD and FPS Arena installed with lifecycle scripts disabled and built successfully. The distiller codex variant passed 12 mocked/offline tests; other variants remain unverified. OpenSora's supported Node 22 install failed on the inherited ESLint peer conflict, so its API build was not reached. ShieldCheck consists only of planning artifacts. These checks do not establish interactive correctness or hosted-service availability.

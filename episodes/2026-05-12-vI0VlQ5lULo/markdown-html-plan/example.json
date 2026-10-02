@@ -7,7 +7,7 @@
   "license": "reuse terms pending; third-party materials retain their own terms",
   "verification": {
     "secret_scan": "no findings in audited candidate/history; bounded coverage",
-    "runtime": "pending focused checks"
+    "runtime": "Static Markdown/HTML planning artifacts; no scanner implementation or runtime claim."
   },
   "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
 }
