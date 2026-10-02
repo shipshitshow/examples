@@ -1,0 +1,13 @@
+{
+  "slug": "free-model-distiller",
+  "episode_id": "eYGDOk2HsOg",
+  "source": "Studio source snapshot; original remote workflow-only or source untracked",
+  "source_revision": "local snapshot 2026-10-02",
+  "status": "historical-demo",
+  "license": "reuse terms pending; third-party materials retain their own terms",
+  "verification": {
+    "secret_scan": "no findings in audited candidate/history; bounded coverage",
+    "runtime": "pending focused checks"
+  },
+  "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
+}

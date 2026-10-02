@@ -1,0 +1,13 @@
+{
+  "slug": "agent-flow-debugger",
+  "episode_id": "p-WXHu2gU2s",
+  "source": "https://github.com/shipshitshow/opus48",
+  "source_revision": "b9b7d65 (public archive snapshot)",
+  "status": "historical-demo",
+  "license": "reuse terms pending; third-party materials retain their own terms",
+  "verification": {
+    "secret_scan": "no findings in audited candidate/history; bounded coverage",
+    "runtime": "pending focused checks"
+  },
+  "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
+}

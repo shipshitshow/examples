@@ -1,0 +1,25 @@
+# Flow: Gallery – videos appear after generation
+# Prerequisite: user has at least one completed generation (run 03-create-flow first)
+# Expected result: gallery shows the generated video with correct metadata
+
+appId: xyz.opensora.app
+---
+- launchApp
+
+- assertVisible: 'Gallery'
+- tapOn: 'Gallery'
+
+# Gallery screen must show at least one video card
+- assertVisible:
+    id: 'gallery-list'
+
+# First item should have a thumbnail and status badge
+- assertVisible:
+    id: 'video-card-0'
+
+# Tapping a completed video opens the detail/playback view
+- tapOn:
+    id: 'video-card-0'
+
+- assertVisible:
+    id: 'video-player'

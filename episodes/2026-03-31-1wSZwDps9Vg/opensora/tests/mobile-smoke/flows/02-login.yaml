@@ -1,0 +1,39 @@
+# Flow: Login with existing credentials
+# Prerequisite: a staging test account exists (email/password set via env or seeded)
+# Expected result: user lands on home screen; invalid credentials show error
+
+appId: xyz.opensora.app
+---
+- launchApp:
+    clearState: true
+
+- tapOn: 'Sign In'
+
+# --- Valid login ---
+- tapOn:
+    id: 'input-email'
+- inputText: '${SMOKE_TEST_EMAIL}'
+
+- tapOn:
+    id: 'input-password'
+- inputText: '${SMOKE_TEST_PASSWORD}'
+
+- tapOn: 'Sign In'
+- assertVisible: 'Generate'
+
+# --- Invalid password shows error ---
+- launchApp:
+    clearState: true
+
+- tapOn: 'Sign In'
+
+- tapOn:
+    id: 'input-email'
+- inputText: '${SMOKE_TEST_EMAIL}'
+
+- tapOn:
+    id: 'input-password'
+- inputText: 'WrongPassword!'
+
+- tapOn: 'Sign In'
+- assertVisible: 'Invalid credentials'

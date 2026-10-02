@@ -1,0 +1,12 @@
+{
+  "youtube_id": "vI0VlQ5lULo",
+  "title": "Markdown and HTML planning",
+  "youtube_url": "https://www.youtube.com/watch?v=vI0VlQ5lULo",
+  "relationship_evidence": "Source livestream transcript names ShieldCheck and requests both plan files; Studio plan.md is dated May 12.",
+  "demos": [
+    {
+      "slug": "markdown-html-plan",
+      "path": "episodes/2026-05-12-vI0VlQ5lULo/markdown-html-plan"
+    }
+  ]
+}

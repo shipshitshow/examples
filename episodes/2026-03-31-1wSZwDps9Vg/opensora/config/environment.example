@@ -1,0 +1,49 @@
+# ─── Required ────────────────────────────────────────────────────────────────
+
+# MongoDB connection URI
+# Local docker-compose default: mongodb://localhost:27017/opensora
+# Atlas production: mongodb+srv://app-prod:<password>@cluster.xxxxx.mongodb.net/opensoraxyz
+MONGODB_URI=mongodb://localhost:27017/opensora
+
+# JWT signing secret — must be at least 32 characters
+JWT_SECRET=change-me-to-a-random-32-char-secret
+
+# ─── API Server ───────────────────────────────────────────────────────────────
+
+NODE_ENV=development
+PORT=3001
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=http://localhost:3000
+APP_URL=http://localhost:3000
+FREE_CREDITS_ON_SIGNUP=10
+CREDITS_PER_GENERATION=1
+
+# ─── Cloudflare R2 (file storage — optional, falls back to no storage) ────────
+
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_DOMAIN=
+
+# ─── AI Video Generation ──────────────────────────────────────────────────────
+
+# fal.ai API key — optional; omit to run in mock mode
+FAL_KEY=
+REPLICATE_API_TOKEN=
+
+# ─── Stripe (payments — optional) ────────────────────────────────────────────
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRO_PRICE_ID=
+
+# ─── PostHog (analytics — optional) ──────────────────────────────────────────
+
+# Server-side (API)
+POSTHOG_API_KEY=
+POSTHOG_HOST=https://us.i.posthog.com
+
+# Client-side (web — must be prefixed with NEXT_PUBLIC_)
+NEXT_PUBLIC_POSTHOG_KEY=
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com

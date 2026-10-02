@@ -1,0 +1,65 @@
+name: QA Smoke Tests
+
+on:
+  push:
+    branches:
+      - main
+
+# Cancel any in-progress run for the same branch so only the latest commit
+# on main is tested (avoids piling up jobs after fast merges).
+concurrency:
+  group: qa-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke tests – staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Set STAGING_API_URL in Settings → Secrets → Actions.
+      # Example: https://api-staging.opensora.xyz
+      BASE_URL: ${{ secrets.STAGING_API_URL }}
+      CI: "true"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm ci
+
+      - name: Run smoke tests
+        working-directory: tests
+        run: npm run test:smoke
+        # Give individual tests up to 30 s (set in jest.config.ts); the job
+        # timeout above acts as an overall ceiling.
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-coverage-${{ github.sha }}
+          path: tests/coverage/
+          retention-days: 14
+
+      - name: Summarise results in job summary
+        if: always()
+        run: |
+          echo "## QA Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Target | \`${{ secrets.STAGING_API_URL }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY

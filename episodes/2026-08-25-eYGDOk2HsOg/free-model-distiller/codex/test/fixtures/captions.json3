@@ -1,0 +1,20 @@
+{
+  "events": [
+    {
+      "tStartMs": 1000,
+      "dDurationMs": 3000,
+      "segs": [
+        { "utf8": "Hello", "tOffsetMs": 0 },
+        { "utf8": " world", "tOffsetMs": 500 },
+        { "utf8": ".", "tOffsetMs": 900 }
+      ]
+    },
+    {
+      "tStartMs": 5000,
+      "dDurationMs": 2000,
+      "segs": [
+        { "utf8": "A second caption", "tOffsetMs": 100 }
+      ]
+    }
+  ]
+}

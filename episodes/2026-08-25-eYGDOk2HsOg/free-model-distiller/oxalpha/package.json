@@ -1,0 +1,12 @@
+{
+  "name": "yt-distiller",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "cli": "bun run src/cli.ts",
+    "serve": "bun run src/server.ts"
+  },
+  "devDependencies": {
+    "bun-types": "^1.4.0"
+  }
+}

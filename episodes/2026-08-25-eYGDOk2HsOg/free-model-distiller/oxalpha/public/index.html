@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Distiller</title>
+<style>
+  :root { --bg:#fff; --text:#222; --muted:#666; --border:#ddd; --accent:#1976d2; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1a1a1a; --text:#e0e0e0; --muted:#999; --border:#333; --accent:#64b5f6; }
+  }
+  body { max-width:820px; margin:32px auto; padding:0 20px; font-family:system-ui;
+         background:var(--bg); color:var(--text); line-height:1.5; }
+  form { display:flex; gap:8px; margin-bottom:16px; }
+  input[type=url] { flex:1; padding:10px; border:1px solid var(--border); border-radius:6px;
+                    background:var(--bg); color:var(--text); font-size:1rem; }
+  button { padding:10px 18px; border:none; border-radius:6px; background:var(--accent);
+           color:#fff; font-size:1rem; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  .budget { color:var(--muted); font-size:.85rem; margin-bottom:12px; min-height:1.2em; }
+  #log { font-family:ui-monospace,monospace; font-size:.82rem; white-space:pre-wrap;
+         background:var(--border); border-radius:6px; padding:12px; max-height:220px;
+         overflow-y:auto; display:none; margin-bottom:16px; }
+  #brief { border-left:3px solid var(--accent); padding:8px 14px; margin-bottom:20px; display:none; }
+  .clip { border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:14px; }
+  .clip h3 { margin:0 0 4px; font-size:1rem; }
+  .clip .why { color:var(--muted); font-size:.85rem; margin-bottom:8px; }
+  video { width:100%; border-radius:6px; background:#000; }
+</style>
+</head>
+<body>
+<h1>YouTube Distiller</h1>
+<form id="f">
+  <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=..." required>
+  <button id="go">Distill</button>
+</form>
+<div class="budget" id="budget"></div>
+<div id="log"></div>
+<section id="brief"></section>
+<main id="clips"></main>
+<script>
+const $ = (id) => document.getElementById(id);
+let es = null;
+
+$("f").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const url = $("url").value.trim();
+  if (!url) return;
+  $("go").disabled = true;
+  $("log").textContent = "";
+  $("log").style.display = "block";
+  $("clips").textContent = "";
+  $("brief").style.display = "none";
+  if (es) es.close();
+  es = new EventSource(`/events?url=${encodeURIComponent(url)}`);
+  es.addEventListener("progress", (msg) => handle(JSON.parse(msg.data)));
+  es.onerror = () => { $("go").disabled = false; es.close(); };
+});
+
+function handle(ev) {
+  switch (ev.type) {
+    case "run:start": log(`▶ ${ev.videoId}`); break;
+    case "step:start": log(`— ${ev.step}`); break;
+    case "progress": log(`  ${ev.message}`); break;
+    case "request:start": log(`  → model ${ev.model}`); break;
+    case "request:end":
+      log(`  ← ${ev.model} ${ev.ms}ms`);
+      $("budget").textContent =
+        `free budget — this run: ${ev.runRequests} · today: ${ev.today}/1000 · minute: ${ev.minute}/20`;
+      break;
+    case "request:fallback": log(`  ⚠ fallback ${ev.from} → ${ev.to} (${ev.cause})`); break;
+    case "brief:done":
+      $("brief").textContent = ev.brief;
+      $("brief").style.display = "block";
+      log(`\n${ev.momentCount} moment(s):`);
+      break;
+    case "moment:done": addClip(ev.index, ev.title, ev.file); break;
+    case "done": log("✓ done"); finish(); break;
+    case "error": log(`✗ ${ev.message}`); finish(); break;
+  }
+}
+
+function log(s) { $("log").textContent += s + "\n"; $("log").scrollTop = 1e9; }
+function finish() { $("go").disabled = false; if (es) es.close(); }
+
+function addClip(i, title, file) {
+  const d = document.createElement("div");
+  d.className = "clip";
+  const h = document.createElement("h3");
+  h.textContent = `#${i} ${title}`;
+  const v = document.createElement("video");
+  v.controls = true;
+  v.preload = "none";
+  v.src = `/clips/${file.replace(/^work\//, "")}`;
+  d.append(h, v);
+  $("clips").append(d);
+}
+</script>
+</body>
+</html>

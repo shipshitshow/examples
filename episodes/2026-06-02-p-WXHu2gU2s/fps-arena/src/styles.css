@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-accent: #00d8ff;
+  --color-danger: #ff4d6d;
+  --color-good: #39d353;
+  --color-warn: #ffb02e;
+  --color-ink: #0e1320;
+  --color-fg: #eef2f7;
+
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+
+  --animate-hit: hitpop 0.18s ease-out;
+  --animate-hit-kill: hitpop 0.28s ease-out;
+  --animate-hit-head: hitpop 0.24s ease-out;
+  --animate-dmg: dmg 0.4s ease-out;
+  --animate-bosspulse: bosspulse 1s ease-in-out infinite;
+  --animate-bannerpop: bannerpop 1.8s ease-out forwards;
+  --animate-toastpop: toastpop 1.4s ease-out forwards;
+  --animate-blink: blink 0.9s steps(2, start) infinite;
+  --animate-dmgnum: dmgnum 0.9s ease-out forwards;
+
+  @keyframes hitpop {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(45deg) scale(0.9);
+    }
+  }
+  @keyframes dmg {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes bosspulse {
+    0%,
+    100% {
+      text-shadow: 0 0 6px rgba(255, 77, 109, 0.4);
+    }
+    50% {
+      text-shadow: 0 0 16px rgba(255, 77, 109, 0.9);
+    }
+  }
+  @keyframes bannerpop {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.7);
+    }
+    15% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+    70% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  @keyframes toastpop {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 12px);
+    }
+    18% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    72% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -14px);
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes dmgnum {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0) scale(0.6);
+    }
+    15% {
+      opacity: 1;
+      transform: translate(-50%, -8px) scale(1.1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -42px) scale(1);
+    }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--color-ink);
+    color: var(--color-fg);
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: var(--font-sans);
+  }
+
+  /* Three.js injects its <canvas> into .game-root at runtime. */
+  .game-root canvas {
+    display: block;
+  }
+
+  kbd {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+
+  /* When paused, freeze every in-flight HUD animation — except the pause
+     overlay's own UI (marked .pause-ui). */
+  .hud-paused *:not(.pause-ui):not(.pause-ui *) {
+    animation-play-state: paused !important;
+  }
+}

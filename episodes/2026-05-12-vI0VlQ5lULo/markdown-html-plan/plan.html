@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShieldCheck - Implementation Plan</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --critical: #f85149;
+      --high: #d29922;
+      --medium: #e3b341;
+      --low: #3fb950;
+      --info: #8b949e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a371f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header .tagline {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    header .badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 1rem; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+      background: rgba(110, 118, 129, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--surface);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    td { background: rgba(22, 27, 34, 0.5); }
+
+    tr:hover td { background: rgba(88, 166, 255, 0.05); }
+
+    .severity-critical { color: var(--critical); font-weight: 700; }
+    .severity-high { color: var(--high); font-weight: 700; }
+    .severity-medium { color: var(--medium); }
+    .severity-low { color: var(--low); }
+    .severity-info { color: var(--info); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .tree {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .tree .dir { color: var(--accent); }
+    .tree .file { color: var(--text); }
+    .tree .comment { color: var(--text-muted); font-style: italic; }
+
+    ul {
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li { margin-bottom: 0.35rem; }
+
+    .verdict-box {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .verdict-compromised {
+      background: rgba(248, 81, 73, 0.1);
+      border: 2px solid var(--critical);
+      color: var(--critical);
+    }
+
+    .verdict-suspicious {
+      background: rgba(210, 153, 34, 0.1);
+      border: 2px solid var(--high);
+      color: var(--high);
+    }
+
+    .verdict-clean {
+      background: rgba(63, 185, 80, 0.1);
+      border: 2px solid var(--low);
+      color: var(--low);
+    }
+
+    .metrics-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+      .two-col { grid-template-columns: 1fr; }
+      header h1 { font-size: 1.6rem; }
+    }
+
+    .scanner-card {
+      border-left: 3px solid var(--accent);
+    }
+
+    .phase-list {
+      counter-reset: phase;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .phase-list li {
+      counter-increment: phase;
+      padding: 0.75rem 1rem 0.75rem 3rem;
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-list li::before {
+      content: counter(phase);
+      position: absolute;
+      left: 0.75rem;
+      top: 0.75rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ShieldCheck</h1>
+    <p class="tagline">Supply chain integrity scanner for the Mini Shai-Hulud TanStack attack vector</p>
+    <span class="badge">Implementation Plan</span>
+  </header>
+
+  <h2>Context</h2>
+  <p>
+    The <strong>Mini Shai-Hulud</strong> supply chain attack compromised <strong>84+ TanStack npm artifacts</strong>,
+    <code>@opensearch-project/opensearch</code>, <code>@squawk/*</code> packages, and PyPI packages
+    (<code>mistralai</code>, <code>guardrails-ai</code>). The attack exploited GitHub Actions OIDC token theft via
+    <code>pull_request_target</code> abuse and cache poisoning to publish malicious versions. The malware harvests
+    credentials (GitHub, AWS, Vault, K8s), persists via <code>.claude/</code> and <code>.vscode/</code> directories,
+    and exfiltrates data through the Session P2P network.
+  </p>
+  <p>
+    <strong>ShieldCheck</strong> is a zero-dependency Node.js CLI tool that scans local projects for signs of this
+    specific attack, producing color-coded console output and self-contained HTML/Markdown reports.
+  </p>
+
+  <h2>Compromised Packages</h2>
+
+  <h3>npm</h3>
+  <table>
+    <thead>
+      <tr><th>Scope / Package</th><th>Affected Versions</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>@tanstack/*</code></td><td>84 artifacts</td><td>Full scope compromise</td></tr>
+      <tr><td><code>@opensearch-project/opensearch</code></td><td>3.5.3, 3.6.2, 3.7.0, 3.8.0</td><td>optionalDependencies injection</td></tr>
+      <tr><td><code>@squawk/mcp</code></td><td>0.9.5</td><td>Campaign expansion</td></tr>
+      <tr><td><code>@squawk/weather</code></td><td>0.5.10</td><td>Campaign expansion</td></tr>
+      <tr><td><code>@squawk/flightplan</code></td><td>0.5.6</td><td>Campaign expansion</td></tr>
+    </tbody>
+  </table>
+
+  <h3>PyPI</h3>
+  <table>
+    <thead>
+      <tr><th>Package</th><th>Affected Version</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>mistralai</code></td><td>2.4.6</td></tr>
+      <tr><td><code>guardrails-ai</code></td><td>0.10.1</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Indicators of Compromise</h2>
+
+  <h3>Malicious File Hashes</h3>
+  <table>
+    <thead>
+      <tr><th>File</th><th>SHA256</th><th>Severity</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>router_init.js</code></td>
+        <td><code>ab4fcadaec49c032...e15d7b90f2fa8601266c</code></td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+      </tr>
+      <tr>
+        <td><code>tanstack_runner.js</code></td>
+        <td><code>2ec78d556d696e20...2ed2e98d6be27fc96</code></td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Network IOCs</h3>
+  <table>
+    <thead>
+      <tr><th>Indicator</th><th>Type</th><th>Severity</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>filev2.getsession[.]org/file/</code></td>
+        <td>Exfiltration endpoint</td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+      </tr>
+      <tr>
+        <td><code>git-tanstack.com</code></td>
+        <td>Malicious domain (payload delivery)</td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+      </tr>
+      <tr>
+        <td><code>getsession.org</code></td>
+        <td>C2 via Session P2P</td>
+        <td><span class="severity-high">HIGH</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Persistence Artifacts</h3>
+  <table>
+    <thead>
+      <tr><th>Path</th><th>Severity</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>.claude/router_runtime.js</code></td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+        <td>Malware persistence via Claude Code</td>
+      </tr>
+      <tr>
+        <td><code>.claude/settings.json</code></td>
+        <td><span class="severity-high">HIGH</span></td>
+        <td>Claude config hijack (hooks/MCP)</td>
+      </tr>
+      <tr>
+        <td><code>.claude/setup.mjs</code></td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+        <td>Claude Code setup hijack</td>
+      </tr>
+      <tr>
+        <td><code>.vscode/tasks.json</code></td>
+        <td><span class="severity-high">HIGH</span></td>
+        <td>VS Code task persistence</td>
+      </tr>
+      <tr>
+        <td><code>.vscode/setup.mjs</code></td>
+        <td><span class="severity-critical">CRITICAL</span></td>
+        <td>VS Code setup hijack</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Git Indicators</h3>
+  <ul>
+    <li><strong>Spoofed author:</strong> <code>claude@users.noreply.github.com</code></li>
+    <li><strong>Suspicious account:</strong> <code>voicproducoes</code></li>
+  </ul>
+
+  <h2>App Architecture</h2>
+  <div class="tree">
+    <span class="dir">mdtohtml/</span><br>
+    &nbsp;&nbsp;<span class="file">package.json</span><br>
+    &nbsp;&nbsp;<span class="dir">bin/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">shieldcheck.js</span> <span class="comment"># CLI entry point</span><br>
+    &nbsp;&nbsp;<span class="dir">src/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">ioc-database.js</span> <span class="comment"># All IOC definitions</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">scanner-engine.js</span> <span class="comment"># Orchestrator</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">scanners/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">file-hash-scanner.js</span> <span class="comment"># SHA256 matching</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">package-scanner.js</span> <span class="comment"># package.json/lockfile analysis</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">persistence-scanner.js</span> <span class="comment"># .claude/ and .vscode/ detection</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">git-history-scanner.js</span> <span class="comment"># Git log analysis</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">obfuscation-scanner.js</span> <span class="comment"># JS Obfuscator patterns</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">network-ioc-scanner.js</span> <span class="comment"># Domain/URL scanning</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">node-modules-scanner.js</span> <span class="comment"># node_modules inspection</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">reporters/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">console-reporter.js</span> <span class="comment"># Color-coded terminal output</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">html-reporter.js</span> <span class="comment"># Self-contained HTML5 report</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">md-reporter.js</span> <span class="comment"># Markdown report</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">utils/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">file-walker.js</span> <span class="comment"># Async generator traversal</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">hash.js</span> <span class="comment"># SHA256 via Node crypto</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">logger.js</span> <span class="comment"># Structured logging</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">ansi.js</span> <span class="comment"># ANSI color constants</span><br>
+  </div>
+
+  <h2>Scanner Modules</h2>
+
+  <div class="card scanner-card">
+    <h3>1. File Hash Scanner</h3>
+    <p>Walks all <code>.js/.mjs/.cjs</code> files, computes SHA256 via streaming, matches against IOC hashes. Also flags files named <code>router_init.js</code>, <code>tanstack_runner.js</code>, or <code>router_runtime.js</code> regardless of hash. Uses 8-way parallel reads with a semaphore.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>2. Package Scanner</h3>
+    <p>Parses <code>package.json</code> for compromised dependencies. Checks <code>package-lock.json</code> for unexpected <code>resolved</code> URLs and <code>integrity</code> mismatches. Detects malicious <code>optionalDependencies</code> injection (attack signature). Flags suspicious lifecycle scripts.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>3. Persistence Scanner</h3>
+    <p>Checks for IOC persistence paths. Parses <code>.claude/settings.json</code> for hooks/MCP servers. Parses <code>.vscode/tasks.json</code> for shell tasks. Flags any <code>.mjs</code> files inside <code>.claude/</code> or <code>.vscode/</code>.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>4. Git History Scanner</h3>
+    <p>Runs <code>git log --since=2025-04-01</code>. Checks author emails against IOC actors. Checks commit messages against known attack patterns. Reports changed files for flagged commits. Gracefully skips non-git directories.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>5. Obfuscation Scanner</h3>
+    <p>Tests JS files against JavaScript Obfuscator signatures (<code>_0x</code> patterns, hex encoding, <code>eval</code>+<code>atob</code>, <code>Function</code> constructor). Calculates Shannon entropy per file (threshold: 5.5 bits/char). Allowlists minified bundles.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>6. Network IOC Scanner</h3>
+    <p>Scans text files for malicious domains/URLs. Checks for base64-encoded C2 domains. Scans <code>.env</code> files for staged credential exfiltration. Reports file, line number, and context.</p>
+  </div>
+
+  <div class="card scanner-card">
+    <h3>7. Node Modules Scanner</h3>
+    <p>Inspects installed packages matching compromised scopes. Reads <code>_resolved</code>/<code>_integrity</code> from package metadata. Searches for unexpected files in package directories. Checks <code>node_modules/.cache/</code> for cache poisoning.</p>
+  </div>
+
+  <h2>Severity &amp; Verdict System</h2>
+
+  <table>
+    <thead>
+      <tr><th>Level</th><th>Weight</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="severity-critical">CRITICAL</span></td><td>10</td><td>Known malware IOC match</td></tr>
+      <tr><td><span class="severity-high">HIGH</span></td><td>5</td><td>Strong indicator of compromise</td></tr>
+      <tr><td><span class="severity-medium">MEDIUM</span></td><td>2</td><td>Potential concern, needs investigation</td></tr>
+      <tr><td><span class="severity-low">LOW</span></td><td>1</td><td>Minor anomaly</td></tr>
+      <tr><td><span class="severity-info">INFO</span></td><td>0</td><td>Informational</td></tr>
+    </tbody>
+  </table>
+
+  <div class="verdict-box verdict-compromised">
+    COMPROMISED &mdash; any CRITICAL finding, or total score &ge; 20
+  </div>
+  <div class="verdict-box verdict-suspicious">
+    SUSPICIOUS &mdash; any HIGH finding, or total score &ge; 5
+  </div>
+  <div class="verdict-box verdict-clean">
+    CLEAN &mdash; otherwise
+  </div>
+
+  <h2>CLI Usage</h2>
+  <pre><code>shieldcheck [target-dir] [options]
+
+  -o, --output &lt;format&gt;    console | html | md | all (default: console)
+  -d, --deep               Deep scan including node_modules internals
+  -v, --verbose            Show INFO level findings
+  --output-dir &lt;path&gt;      Report directory (default: ./shieldcheck-reports)
+  --since &lt;date&gt;           Git history start date (default: 2025-04-01)
+  --no-color               Disable colored output
+  -h, --help               Show help
+
+Exit codes: 0 = CLEAN, 1 = SUSPICIOUS, 2 = COMPROMISED</code></pre>
+
+  <h2>Implementation Order</h2>
+  <ol class="phase-list">
+    <li><strong>Foundation</strong> &mdash; <code>package.json</code>, <code>utils/</code> (ansi, logger, hash, file-walker)</li>
+    <li><strong>IOC Database</strong> &mdash; <code>ioc-database.js</code> with all attack indicators</li>
+    <li><strong>Scanner Engine</strong> &mdash; <code>scanner-engine.js</code> orchestrator</li>
+    <li><strong>Scanners</strong> &mdash; all 7 modules (built in parallel)</li>
+    <li><strong>Reporters</strong> &mdash; console, HTML, Markdown</li>
+    <li><strong>CLI</strong> &mdash; <code>bin/shieldcheck.js</code> entry point</li>
+  </ol>
+
+  <h2>Design Principles</h2>
+  <ul>
+    <li><strong>Zero dependencies</strong> &mdash; a security tool must not trust external packages; every line is auditable</li>
+    <li><strong>Async generators</strong> &mdash; memory-efficient traversal for large <code>node_modules</code> trees</li>
+    <li><strong><code>Promise.allSettled</code></strong> &mdash; one failing scanner doesn't abort the rest</li>
+    <li><strong>Streaming hashes</strong> &mdash; no OOM on large files</li>
+    <li><strong>Self-contained HTML</strong> &mdash; no CDN, works offline, can't be tampered with via MITM</li>
+    <li><strong>Node 18+ required</strong> &mdash; built-in <code>node:test</code>, <code>fs/promises</code>, <code>crypto</code></li>
+  </ul>
+
+  <h2>Verification Plan</h2>
+  <ol>
+    <li>Run <code>shieldcheck .</code> on the project itself (expect CLEAN)</li>
+    <li>Create test fixtures with planted IOCs (malicious hash, persistence files, compromised dependency, C2 domain in source)</li>
+    <li>Run <code>shieldcheck test-fixtures/ --output all</code> and verify all 3 outputs</li>
+    <li>Confirm HTML report makes zero network requests (browser DevTools)</li>
+    <li>Verify exit code 2 for COMPROMISED fixture</li>
+  </ol>
+
+  <div class="metrics-footer">
+    <h2>Generation Metrics</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Plan format</td><td>HTML5</td></tr>
+        <tr><td>Estimated output tokens</td><td>~6,200</td></tr>
+        <tr><td>Estimated input tokens</td><td>~8,200</td></tr>
+        <tr><td>Model</td><td>Claude Opus 4.6</td></tr>
+        <tr><td>Generated</td><td>2026-05-12</td></tr>
+        <tr><td>HTML self-contained</td><td>Yes (inline CSS, no external resources)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer style="text-align: center; padding: 2rem 0 1rem; color: var(--text-muted); font-size: 0.8rem;">
+    Generated by Claude Opus 4.6 &middot; ShieldCheck Implementation Plan &middot; 2026-05-12
+  </footer>
+
+</body>
+</html>

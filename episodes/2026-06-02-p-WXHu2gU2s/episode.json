@@ -1,0 +1,20 @@
+{
+  "youtube_id": "p-WXHu2gU2s",
+  "title": "Claude Opus 4.8 demos",
+  "youtube_url": "https://www.youtube.com/watch?v=p-WXHu2gU2s",
+  "relationship_evidence": "original opus48 README",
+  "demos": [
+    {
+      "slug": "agent-flow-debugger",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/agent-flow-debugger"
+    },
+    {
+      "slug": "pocket-cad",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/pocket-cad"
+    },
+    {
+      "slug": "fps-arena",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/fps-arena"
+    }
+  ]
+}

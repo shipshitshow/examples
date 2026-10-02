@@ -1,0 +1,47 @@
+{
+  "observed_on": "2026-10-02",
+  "examples": [
+    {
+      "episode_id": "p-WXHu2gU2s",
+      "episode_path": "episodes/2026-06-02-p-WXHu2gU2s",
+      "slug": "agent-flow-debugger",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/agent-flow-debugger",
+      "status": "historical-demo"
+    },
+    {
+      "episode_id": "p-WXHu2gU2s",
+      "episode_path": "episodes/2026-06-02-p-WXHu2gU2s",
+      "slug": "pocket-cad",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/pocket-cad",
+      "status": "historical-demo"
+    },
+    {
+      "episode_id": "p-WXHu2gU2s",
+      "episode_path": "episodes/2026-06-02-p-WXHu2gU2s",
+      "slug": "fps-arena",
+      "path": "episodes/2026-06-02-p-WXHu2gU2s/fps-arena",
+      "status": "historical-demo"
+    },
+    {
+      "episode_id": "1wSZwDps9Vg",
+      "episode_path": "episodes/2026-03-31-1wSZwDps9Vg",
+      "slug": "opensora",
+      "path": "episodes/2026-03-31-1wSZwDps9Vg/opensora",
+      "status": "historical-demo"
+    },
+    {
+      "episode_id": "vI0VlQ5lULo",
+      "episode_path": "episodes/2026-05-12-vI0VlQ5lULo",
+      "slug": "markdown-html-plan",
+      "path": "episodes/2026-05-12-vI0VlQ5lULo/markdown-html-plan",
+      "status": "planning-artifact"
+    },
+    {
+      "episode_id": "eYGDOk2HsOg",
+      "episode_path": "episodes/2026-08-25-eYGDOk2HsOg",
+      "slug": "free-model-distiller",
+      "path": "episodes/2026-08-25-eYGDOk2HsOg/free-model-distiller",
+      "status": "historical-demo"
+    }
+  ]
+}

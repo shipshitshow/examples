@@ -1,0 +1,22 @@
+# Flow: Error state – no network connection
+# This flow must be run with the device in airplane mode or with the network
+# simulator configured to block all traffic.
+# Expected result: app shows a friendly offline / network error message rather
+# than crashing or hanging indefinitely.
+
+appId: xyz.opensora.app
+---
+- launchApp
+
+# Attempt to navigate to the generate screen while offline
+- assertVisible: 'Generate'
+- tapOn: 'Generate'
+
+- tapOn:
+    id: 'prompt-input'
+- inputText: 'Mountains at dusk'
+- tapOn: 'Generate Video'
+
+# The app must surface a network error message
+- assertVisible: 'No internet connection'
+# OR: "Unable to reach server" — accept either

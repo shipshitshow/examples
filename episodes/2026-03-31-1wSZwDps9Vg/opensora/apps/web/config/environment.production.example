@@ -1,0 +1,30 @@
+# MongoDB Atlas connection string (same as API — set in Vercel dashboard, not committed)
+MONGODB_URI=mongodb+srv://app-prod:<password>@opensoraxyz-prod.XXXXX.mongodb.net/opensoraxyz?retryWrites=true&w=majority
+
+# NextAuth
+NEXTAUTH_URL=https://app.opensorax.xyz
+NEXTAUTH_SECRET=REPLACE_WITH_LONG_RANDOM_SECRET_MIN_32_CHARS
+
+# API backend URL
+API_URL=https://api.opensorax.xyz
+
+# fal.ai API key
+FAL_KEY=REPLACE_WITH_FAL_API_KEY
+
+# Credit configuration
+FREE_CREDITS_ON_SIGNUP=10
+CREDITS_PER_GENERATION=1
+
+# Cloudflare R2 (optional)
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_DOMAIN=
+
+# PostHog Analytics (optional)
+POSTHOG_API_KEY=
+POSTHOG_HOST=https://us.i.posthog.com
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=REPLACE_WITH_STRIPE_PUBLISHABLE_KEY

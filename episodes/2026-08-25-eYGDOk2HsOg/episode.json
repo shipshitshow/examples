@@ -1,0 +1,12 @@
+{
+  "youtube_id": "eYGDOk2HsOg",
+  "title": "Free-model distiller \u2014 episode mapping pending",
+  "youtube_url": "https://www.youtube.com/watch?v=eYGDOk2HsOg",
+  "relationship_evidence": "Original August 25 source notes explicitly name the YouTube Distiller build and link this stream; the August 28 recap transcript repeats the same prompt/tool.",
+  "demos": [
+    {
+      "slug": "free-model-distiller",
+      "path": "episodes/2026-08-25-eYGDOk2HsOg/free-model-distiller"
+    }
+  ]
+}

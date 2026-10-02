@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#090909] text-white antialiased;
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-syne), system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-7 py-3.5 text-xs font-bold rounded-lg
+           bg-brand-500 hover:bg-brand-400 text-white
+           transition-all duration-200
+           tracking-[0.12em] uppercase
+           shadow-[0_0_24px_rgba(245,158,11,0.22)]
+           hover:shadow-[0_0_36px_rgba(245,158,11,0.4)]
+           hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-7 py-3.5 text-xs font-bold rounded-lg
+           border border-white/10 hover:border-brand-500/40
+           text-white/70 hover:text-white
+           bg-white/[0.03] hover:bg-white/[0.06]
+           transition-all duration-200
+           tracking-[0.12em] uppercase;
+  }
+
+  .glass-card {
+    @apply rounded-xl border border-white/[0.07] bg-white/[0.03];
+  }
+
+  .section-label {
+    @apply text-[10px] font-bold tracking-[0.3em] uppercase text-brand-400/70;
+  }
+
+  .text-outline {
+    -webkit-text-stroke: 1px currentColor;
+    color: transparent;
+  }
+
+  .film-perfs {
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 8px,
+      rgba(245, 158, 11, 0.15) 8px,
+      rgba(245, 158, 11, 0.15) 10px
+    );
+  }
+}
