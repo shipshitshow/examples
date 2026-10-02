@@ -11,3 +11,5 @@ Publication excludes `.env*`, private experiment folders, dependencies and media
 ## Focused verification — October 2, 2026
 
 On Studio, AgentFlowDebugger, PocketCAD and FPS Arena installed with lifecycle scripts disabled and built successfully. The distiller codex variant passed 12 mocked/offline tests; other variants remain unverified. OpenSora's supported Node 22 install failed on the inherited ESLint peer conflict, so its API build was not reached. ShieldCheck consists only of planning artifacts. These checks do not establish interactive correctness or hosted-service availability.
+
+The bundled-media inventory is recorded in `asset-provenance.csv`: 34 WebP textures/sprites, all in FPS Arena. No bundled font files or other media were found in the curated tree. This narrows the audit scope; it does not establish the creator/license of those assets or grant rights to externally loaded resources.
