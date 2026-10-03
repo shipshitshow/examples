@@ -1,0 +1,44 @@
+# Flow: Create video – enter prompt, submit, wait for result, verify playback
+# Prerequisite: user is logged in (use subflow or state file from login flow)
+# Expected result: video appears in gallery and playback starts
+
+appId: xyz.opensora.app
+---
+- launchApp
+
+# Assume user is already authenticated via stored session.
+# If not, add a runFlow pointing to 02-login.yaml first.
+
+- assertVisible: 'Generate'
+- tapOn: 'Generate'
+
+# --- Prompt entry screen ---
+- assertVisible:
+    id: 'prompt-input'
+- tapOn:
+    id: 'prompt-input'
+- inputText: 'A serene aerial shot of snow-capped mountains at golden hour, 4K cinematic slow pan'
+
+# Optionally change aspect ratio
+- tapOn: '16:9' # default; can be tapped to open a picker
+
+# Submit generation
+- tapOn: 'Generate Video'
+
+# --- Processing state ---
+# The UI should show a loading / queued indicator
+- assertVisible: 'Generating'
+
+# Wait up to 120 s for the video to complete (FAL.ai mock returns quickly in test mode)
+- waitForAnimationToEnd:
+    timeout: 120000
+
+# After processing completes the UI should show a play button or video thumbnail
+- assertVisible:
+    id: 'video-player'
+
+# Tap play and verify playback starts (no crash)
+- tapOn:
+    id: 'video-player'
+- assertVisible:
+    id: 'video-controls'

@@ -1,0 +1,28 @@
+{
+  "name": "opensoraxyz-tests",
+  "version": "1.0.0",
+  "description": "QA smoke and regression test harness for OpenSora",
+  "private": true,
+  "scripts": {
+    "test": "jest --config jest.config.ts",
+    "test:smoke": "jest --config jest.config.ts --testPathPattern='smoke'",
+    "test:regression": "jest --config jest.config.ts --testPathPattern='regression'",
+    "test:coverage": "jest --config jest.config.ts --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "^1.7.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.0",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.2",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

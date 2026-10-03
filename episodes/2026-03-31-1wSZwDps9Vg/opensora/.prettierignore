@@ -1,0 +1,8 @@
+node_modules
+.next
+dist
+build
+.expo
+ios
+android
+*.lock

@@ -1,0 +1,12 @@
+# Environment files (contain secrets)
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+__pycache__/
+venv/
+
+# OS / editor
+.DS_Store

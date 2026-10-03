@@ -1,0 +1,13 @@
+{
+  "slug": "pocket-cad",
+  "episode_id": "p-WXHu2gU2s",
+  "source": "https://github.com/shipshitshow/opus48",
+  "source_revision": "b9b7d65 (public archive snapshot)",
+  "status": "historical-demo",
+  "license": "reuse terms pending; third-party materials retain their own terms",
+  "verification": {
+    "secret_scan": "no findings in audited candidate/history; bounded coverage",
+    "runtime": "Studio 2026-10-02: npm ci --ignore-scripts and npm run build passed; Node 26.10.0. No interactive gameplay/browser acceptance claimed."
+  },
+  "assets": "Existing source assets preserved; provenance/rights unresolved unless separately credited."
+}

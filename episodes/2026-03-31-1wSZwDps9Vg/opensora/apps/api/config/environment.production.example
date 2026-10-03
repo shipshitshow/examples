@@ -1,0 +1,42 @@
+# Server
+NODE_ENV=production
+PORT=3001
+
+# MongoDB Atlas — M10 cluster, us-east-1, opensoraxyz-prod project
+# Provision via Atlas UI: https://cloud.mongodb.com
+# DB user: app-prod | DB: opensoraxyz
+MONGODB_URI=mongodb+srv://app-prod:<password>@opensoraxyz-prod.XXXXX.mongodb.net/opensoraxyz?retryWrites=true&w=majority
+
+# JWT (generate with: openssl rand -base64 48)
+JWT_SECRET=REPLACE_WITH_LONG_RANDOM_SECRET_MIN_32_CHARS
+JWT_EXPIRES_IN=7d
+
+# Cloudflare R2 (optional — if not set, fal.ai video URLs are stored directly)
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=opensora-videos
+R2_PUBLIC_DOMAIN=
+
+# AI Video Generation
+FAL_KEY=REPLACE_WITH_FAL_API_KEY
+REPLICATE_API_TOKEN=
+
+# CORS — lock to production web domain
+CORS_ORIGIN=https://app.opensorax.xyz
+
+# Credits
+FREE_CREDITS_ON_SIGNUP=10
+CREDITS_PER_GENERATION=1
+
+# Stripe
+STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET=REPLACE_WITH_STRIPE_WEBHOOK_SECRET
+STRIPE_PRO_PRICE_ID=REPLACE_WITH_STRIPE_PRICE_ID
+
+# App URL (used in emails, callbacks)
+APP_URL=https://app.opensorax.xyz
+
+# PostHog Analytics (optional)
+POSTHOG_API_KEY=
+POSTHOG_HOST=https://us.i.posthog.com

@@ -1,0 +1,32 @@
+# Flow: Onboarding – new user registration
+# Prerequisite: app is running and can reach STAGING_API_URL
+# Expected result: user lands on the home/dashboard screen after sign-up
+
+appId: xyz.opensora.app
+---
+- launchApp:
+    clearState: true
+
+# --- Welcome / splash screen ---
+- assertVisible: 'Welcome to OpenSora'
+- tapOn: 'Get Started'
+
+# --- Sign-up screen ---
+- assertVisible: 'Create your account'
+- tapOn:
+    id: 'input-email'
+- inputText: 'qa-mobile-${randomInt(100000,999999)}@opensorasmoketest.com'
+
+- tapOn:
+    id: 'input-password'
+- inputText: 'TestPass123!'
+
+- tapOn:
+    id: 'input-display-name'
+- inputText: 'QA Mobile Bot'
+
+- tapOn: 'Sign Up'
+
+# --- Verify arrival on home screen ---
+- assertVisible: 'Generate'
+- assertVisible: 'Gallery'

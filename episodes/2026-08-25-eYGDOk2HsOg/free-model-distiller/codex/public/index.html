@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YouTube Distiller — Codex</title>
+    <style>
+      :root { color-scheme: dark; --ink:#f5f3ed; --muted:#9e9b93; --line:#35332e; --paper:#151513; --accent:#ff5d2e; --green:#a8ff78; }
+      * { box-sizing:border-box; }
+      body { margin:0; background:#0d0d0c; color:var(--ink); font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; }
+      main { width:min(1080px,calc(100% - 32px)); margin:0 auto; padding:56px 0 96px; }
+      header { display:grid; grid-template-columns:1fr auto; gap:24px; align-items:end; border-bottom:1px solid var(--line); padding-bottom:24px; }
+      h1 { font:800 clamp(38px,8vw,88px)/.84 system-ui,sans-serif; letter-spacing:-.075em; margin:0; max-width:780px; }
+      h1 em { color:var(--accent); font-style:normal; }
+      .limits { color:var(--muted); text-align:right; font-size:12px; }
+      form { display:grid; grid-template-columns:1fr auto; gap:10px; padding:28px 0; }
+      input,button { font:inherit; border:1px solid var(--line); border-radius:0; }
+      input { min-width:0; padding:16px; background:var(--paper); color:var(--ink); outline:none; }
+      input:focus { border-color:var(--accent); }
+      button { padding:0 26px; background:var(--accent); border-color:var(--accent); color:#160a06; font-weight:900; cursor:pointer; }
+      button:disabled { opacity:.45; cursor:wait; }
+      #status { min-height:54px; border-block:1px solid var(--line); padding:14px 0; color:var(--muted); white-space:pre-wrap; }
+      #status strong { color:var(--ink); }
+      .meter { height:3px; background:var(--line); margin-top:12px; }
+      .meter span { display:block; height:100%; width:0; background:var(--accent); transition:width .25s ease; }
+      #result[hidden] { display:none; }
+      .brief { display:grid; grid-template-columns:130px 1fr; gap:24px; padding:44px 0; border-bottom:1px solid var(--line); }
+      .eyebrow { color:var(--accent); text-transform:uppercase; font-size:12px; letter-spacing:.12em; }
+      .brief p { margin:0; font:500 clamp(20px,3vw,32px)/1.35 system-ui,sans-serif; letter-spacing:-.025em; }
+      .moments { display:grid; gap:1px; background:var(--line); margin-top:32px; border:1px solid var(--line); }
+      article { background:var(--paper); padding:24px; display:grid; grid-template-columns:64px 1fr; gap:18px; }
+      .rank { color:var(--accent); font:800 36px/1 system-ui,sans-serif; }
+      h2 { font:750 22px/1.1 system-ui,sans-serif; margin:0 0 8px; letter-spacing:-.03em; }
+      .time { color:var(--green); font-size:12px; }
+      article p { color:var(--muted); margin:10px 0 0; }
+      video { display:block; width:100%; max-height:460px; background:#000; margin-top:18px; }
+      .error { color:#ff8b77 !important; }
+      @media (max-width:680px) { header,.brief { grid-template-columns:1fr; } .limits { text-align:left; } form { grid-template-columns:1fr; } button { padding:14px; } article { grid-template-columns:42px 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Skip the noise.<br><em>Watch the signal.</em></h1>
+        <div class="limits">ONE MODEL REQUEST<br>ENGLISH CAPTIONS ONLY</div>
+      </header>
+      <form id="form">
+        <input id="url" type="url" required autocomplete="off" placeholder="Paste a YouTube URL" aria-label="YouTube URL">
+        <button id="submit" type="submit">DISTILL →</button>
+      </form>
+      <div id="status" aria-live="polite">Ready · 0/1 model requests used this run<div class="meter"><span id="meter"></span></div></div>
+      <section id="result" hidden>
+        <div class="brief"><div class="eyebrow">What it said</div><p id="brief"></p></div>
+        <div id="moments" class="moments"></div>
+      </section>
+    </main>
+    <script>
+      const form=document.querySelector('#form');
+      const input=document.querySelector('#url');
+      const submit=document.querySelector('#submit');
+      const statusBox=document.querySelector('#status');
+      const meter=document.querySelector('#meter');
+      const resultSection=document.querySelector('#result');
+      const brief=document.querySelector('#brief');
+      const moments=document.querySelector('#moments');
+
+      function formatTime(seconds){const m=Math.floor(seconds/60);const s=seconds%60;return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+      function setStatus(update){
+        const request=update.requestBudget?`${update.requestBudget.usedThisRun}/1 model requests used this run`:'request status unavailable';
+        const issues=update.error?.issues?.length?` · ${update.error.issues.join(' · ')}`:'';
+        statusBox.firstChild.textContent=`${update.phase} / ${update.status} · ${update.message}${issues} · ${request}`;
+        statusBox.classList.toggle('error',update.status==='failed');
+        if(update.progress) meter.style.width=`${update.progress.percent}%`;
+        else if(update.phase==='complete') meter.style.width='100%';
+      }
+      function render(finalResult){
+        resultSection.hidden=false;
+        brief.textContent=finalResult.brief;
+        moments.replaceChildren();
+        for(const moment of finalResult.moments){
+          const clip=finalResult.clips.find(item=>item.rank===moment.rank);
+          const article=document.createElement('article');
+          const rank=document.createElement('div'); rank.className='rank'; rank.textContent=String(moment.rank).padStart(2,'0');
+          const body=document.createElement('div');
+          const title=document.createElement('h2'); title.textContent=moment.title;
+          const time=document.createElement('div'); time.className='time'; time.textContent=`${formatTime(moment.startSeconds)} — ${formatTime(moment.endSeconds)}`;
+          const reason=document.createElement('p'); reason.textContent=moment.reason;
+          body.append(title,time,reason);
+          if(clip?.playable){const video=document.createElement('video');video.controls=true;video.preload='metadata';video.src=`/clips/${finalResult.runId}/${clip.fileName}`;body.append(video);}
+          else {const error=document.createElement('p');error.className='error';error.textContent=clip?.error||'Clip unavailable';body.append(error);}
+          article.append(rank,body);moments.append(article);
+        }
+      }
+      async function readSse(response){
+        if(!response.ok) throw new Error((await response.json()).error||`Request failed: ${response.status}`);
+        if(!response.body) throw new Error('Streaming response unavailable');
+        const reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
+        while(true){const {done,value}=await reader.read();if(done) break;buffer+=decoder.decode(value,{stream:true});
+          let boundary;while((boundary=buffer.indexOf('\n\n'))!==-1){const frame=buffer.slice(0,boundary);buffer=buffer.slice(boundary+2);const dataLine=frame.split('\n').find(line=>line.startsWith('data: '));if(!dataLine) continue;
+            const update=JSON.parse(dataLine.slice(6));setStatus(update);if(update.result) render(update.result);if(update.status==='failed') throw new Error(update.message);
+          }
+        }
+      }
+      form.addEventListener('submit',async event=>{event.preventDefault();submit.disabled=true;submit.textContent='WORKING…';resultSection.hidden=true;moments.replaceChildren();meter.style.width='0';statusBox.classList.remove('error');
+        try{const response=await fetch(`/api/distill?url=${encodeURIComponent(input.value.trim())}`);await readSse(response);}
+        catch(error){statusBox.firstChild.textContent=error instanceof Error?error.message:'Unexpected failure';statusBox.classList.add('error');}
+        finally{submit.disabled=false;submit.textContent='DISTILL →';}
+      });
+    </script>
+  </body>
+</html>

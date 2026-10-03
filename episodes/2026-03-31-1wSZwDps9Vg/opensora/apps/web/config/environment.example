@@ -1,0 +1,21 @@
+# MongoDB Atlas connection string
+# Format: mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
+MONGODB_URI=
+
+# JWT secret — use a long random string (min 32 chars) in production
+JWT_SECRET=
+
+# fal.ai API key — get from https://fal.ai/dashboard/keys
+# Leave empty to use mock mode (no real video generation)
+FAL_KEY=
+
+# Credit configuration
+FREE_CREDITS_ON_SIGNUP=10
+CREDITS_PER_GENERATION=1
+
+# Cloudflare R2 (optional — for storing generated videos)
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_DOMAIN=

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit — oxalpha vs muse plan (YouTube Distiller)</title>
+<style>
+  :root{--bg:#0b0c0f;--panel:#13151a;--panel2:#1a1d24;--b:#232734;--t:#e6e8ee;--m:#9aa0b2;--d:#6b7280;--a:#7c5cff;--ok:#3dd5a8;--warn:#f59e0b;--err:#ef4444;--code:#0f1116;--r:12px;--max:1050px}
+  @media(prefers-color-scheme:light){ :root{--bg:#f8f8fb;--panel:#fff;--panel2:#f1f2f6;--b:#e4e6ee;--t:#0f1116;--m:#5b6172;--d:#8a90a6;--a:#6d28d9;--ok:#059669;--code:#f3f4f8} }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;font-family:ui-sans,system-ui,Inter,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--t);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--a);text-decoration:none} a:hover{text-decoration:underline}
+  header{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--bg) 85%,transparent);border-bottom:1px solid var(--b)}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;flex-wrap:wrap}
+  .brand{display:flex;gap:12px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px var(--warn)}
+  .brand h1{margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em}
+  .brand p{margin:0;font-size:12px;color:var(--m)}
+  .badge{font-size:12px;border:1px solid var(--b);background:var(--panel2);padding:6px 10px;border-radius:999px;color:var(--m)}
+  .badge strong{color:var(--t)}
+  .hero{padding:28px 0 8px}
+  .hero h2{margin:0 0 8px;font-size:30px;letter-spacing:-.03em;line-height:1.15}
+  .hero h2 span{color:var(--a)}
+  .lead{color:var(--m);max-width:80ch;font-size:14px}
+  .kvs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .kv{font-size:12px;background:var(--panel2);border:1px solid var(--b);padding:6px 10px;border-radius:999px;color:var(--m)}
+  .kv strong{color:var(--t)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  @media(max-width:800px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--b);border-radius:var(--r);padding:16px}
+  .card h3{margin:0 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--m)}
+  .card h4{margin:0 0 6px;font-size:14px}
+  .card p{margin:0;color:var(--m);font-size:13px}
+  .verdict{border-left:4px solid var(--warn);background:var(--panel);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin:16px 0}
+  .verdict.ok{border-color:var(--ok)}
+  .verdict.err{border-color:var(--err)}
+  .pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--b);background:var(--panel2);color:var(--m);display:inline-block}
+  .pill.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 30%,var(--b))}
+  .pill.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 30%,var(--b))}
+  .pill.err{color:var(--err);border-color:color-mix(in srgb,var(--err) 30%,var(--b))}
+  .pill.a{color:var(--a);border-color:color-mix(in srgb,var(--a) 30%,var(--b))}
+  h2.sec{font-size:20px;letter-spacing:-.02em;margin:32px 0 10px;padding-top:14px;border-top:1px solid var(--b)}
+  h3.sub{font-size:15px;margin:18px 0 8px}
+  h3.sub span{color:var(--m);font-weight:500}
+  table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;border:1px solid var(--b);border-radius:var(--r);overflow:hidden}
+  th{background:var(--panel2);text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--m);padding:10px 12px;border-bottom:1px solid var(--b)}
+  td{padding:10px 12px;border-bottom:1px solid var(--b);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+  p code,li code,td code{background:var(--code);border:1px solid var(--b);padding:1px 6px;border-radius:6px;word-break:break-word}
+  pre{background:var(--code);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;overflow:auto;font-size:13px;line-height:1.5}
+  pre code{border:none;padding:0;background:transparent}
+  .toc{background:var(--panel);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;margin:16px 0}
+  .toc h3{margin:0 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--d)}
+  .toc ol{margin:0;padding-left:18px;columns:2;column-gap:24px}
+  @media(max-width:700px){.toc ol{columns:1}}
+  .toc li{font-size:13px;margin:3px 0}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  ul,ol{padding-left:20px}
+  li{margin:3px 0;font-size:13px}
+  .small{font-size:12px;color:var(--m)}
+  footer{margin:30px 0 40px;padding-top:14px;border-top:1px solid var(--b);color:var(--d);font-size:12px}
+  .mono{font-family:ui-monospace,monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="dot" title="audit"></div>
+      <div>
+        <h1>Audit — oxalpha <span style="font-weight:500;color:var(--m)">vs</span> muse plan</h1>
+        <p>YouTube Distiller · free-tier invariant · read-only · no edits</p>
+      </div>
+    </div>
+    <div class="badge">Verdict: <strong style="color:var(--warn)">Partial Pass ~65%</strong> · 14/14 files read</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h2>One engine, two faces — <span>did oxalpha keep the invariant?</span></h2>
+    <p class="lead">Full read of <code class="mono">oxalpha/src</code> (13 files) vs <code class="mono">muse/plan.md</code> §A–H + checklist 1–16, cross-checked against the root <code class="mono">src/</code> reference build. No writes.</p>
+    <div class="kvs">
+      <span class="kv"><strong>Scope</strong> 14 files · 8 sections · 16 checklist items</span>
+      <span class="kv"><strong>Invariant</strong> exactly 1 OpenRouter request per video</span>
+      <span class="kv"><strong>Strict TS</strong> · Bun · yt-dlp/ffmpeg shelled</span>
+      <span class="kv"><strong>Key</strong> never logged</span>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <strong>Summary verdict — Partial Pass (~65% faithful).</strong> Core free-tier skeleton intact (single <code>fetch</code> site, model-id constants, shell-out, strict TS, English-only, key hygiene, MVP scope). Material deviations in <strong>layout/ownership (A)</strong>, <strong>validation strictness (D)</strong>, <strong>failure handling (E)</strong>, <strong>request counter (F)</strong>, <strong>progress events (G)</strong>. Checklist 14 would fail on <code>OPENROUTER_API_KEY</code> path and schema strictness.
+    <div class="legend" style="margin-top:10px">
+      <span class="pill ok">Closest</span> deps · strict TS · single fetch · shell-out · English · key hygiene · MVP
+      <span class="pill warn">Farthest</span> file layout · ProgressEvent contract · Budget vs Counter · validation that repairs · ffmpeg fallback · json_object
+    </div>
+  </div>
+
+  <nav class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#layout">File layout & ownership (§A)</a></li>
+      <li><a href="#json3">json3 parsing (§B)</a></li>
+      <li><a href="#single">Single request (§C)</a></li>
+      <li><a href="#validate">Validation (§D)</a></li>
+      <li><a href="#failure">Failure handling (§E)</a></li>
+      <li><a href="#counter">Request counter (§F)</a></li>
+      <li><a href="#events">Progress events (§G)</a></li>
+      <li><a href="#mvp">MVP cut line (§H)</a></li>
+      <li><a href="#invariants">Invariant checks</a></li>
+      <li><a href="#gaps">Gaps vs root</a></li>
+      <li><a href="#checklist">Checklist 1–16</a></li>
+    </ol>
+  </nav>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>If grep invariants ran?</h3>
+      <p><code>fetch</code> ✓ (1 OpenRouter site) · <code>OPENROUTER_API_KEY</code> ✗ (wrong file) · <code>\bany\b</code> ✓ · <code>ts-ignore</code> ✓ → checklist 14 <strong>fails</strong> on key path + schema.</p>
+    </div>
+    <div class="card">
+      <h3>What to fix first</h3>
+      <p>1) <code>validate.ts</code> strict reject not clamp &nbsp;2) <code>Budget</code> → <code>RequestCounter</code> before-fetch &nbsp;3) <code>ProgressEvent</code> shape &nbsp;4) <code>config.ts</code> own <code>getApiKey</code> &nbsp;5) <code>ffmpeg</code> re-encode fallback.</p>
+    </div>
+  </div>
+
+  <!-- A -->
+  <h2 class="sec" id="layout">A) File layout & ownership</h2>
+  <p class="small">Plan expects 11 paths with exact ownership; oxalpha renames/moves 6, adds 4 lib files.</p>
+  <table>
+    <thead><tr><th>Expected (plan)</th><th>Oxalpha path</th><th>Exists</th><th>Owns per plan?</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/config.ts</code> — <code>MODEL_ID</code>, <code>FALLBACK_MODELS</code>, <code>getApiKey()</code></td><td><code>oxalpha/src/config.ts</code></td><td><span class="pill warn">partial</span></td><td><span class="pill err">No</span> — constants yes (<code>MODEL_ID:1</code>, <code>FALLBACK:2-5</code>) but <code>getApiKey()</code> lives in <code>lib/openrouter.ts:4</code>. Adds <code>SEGMENT_GAP_MS</code>, <code>SERVER_PORT</code>. Never touches <code>OPENROUTER_API_KEY</code>.</td><td><code>config:1-14</code> vs reference <code>src/config.ts:7-18</code></td></tr>
+      <tr><td><code>src/types.ts</code> — <code>ProgressEvent</code> etc., no runtime</td><td><code>oxalpha/src/types.ts</code></td><td><span class="pill warn">diverged</span></td><td><span class="pill warn">partial</span> — no runtime ✓ but shape is <code>type</code> union (<code>run:start|step:start|progress|request:start|…|error</code> L56-74) not <code>phase/status/requestCount/timestamp</code>.</td><td><code>types:56-74</code></td></tr>
+      <tr><td><code>src/pipeline.ts</code> — orchestrates 4 steps, owns <code>RequestCounter</code></td><td><code>oxalpha/src/pipeline.ts</code></td><td><span class="pill ok">yes</span></td><td><span class="pill warn">partial</span> — delegates to <code>steps/*</code> ✓, but owns <code>Budget("work/state.json")</code> L12 not <code>RequestCounter</code>; <code>work/&lt;id&gt;</code> not <code>tmp/&lt;runId&gt;</code>; no <code>assert counter ≤3</code>.</td><td>L12, L81-108</td></tr>
+      <tr><td><code>src/yt.ts</code></td><td><code>steps/fetch.ts</code> + <code>lib/shell.ts</code></td><td><span class="pill warn">moved</span></td><td><span class="pill warn">partial</span> — shell-out via <code>Bun.spawn</code> ✓. 3 <code>yt-dlp</code> invocations (caps probe, duration, video) vs 1; glob <code>caps*.json3</code>; generic <code>Error</code> not <code>NoCaptionsError</code>.</td><td><code>fetch:28-49</code></td></tr>
+      <tr><td><code>src/transcript.ts</code> — <code>parseJson3(raw:unknown)</code></td><td><code>steps/transcript.ts</code></td><td><span class="pill warn">moved</span></td><td><span class="pill warn">partial</span> — <code>ev.tStartMs + tOffsetMs</code> ✓, skip missing <code>segs</code> ✓, but signature <code>raw:string</code> not <code>unknown</code>; dedup Set @10ms heuristic undocumented.</td><td>L17-43</td></tr>
+      <tr><td><code>src/llm.ts</code> — only OpenRouter <code>fetch</code></td><td><code>lib/openrouter.ts</code> + <code>steps/analyze.ts</code></td><td><span class="pill warn">split</span></td><td><span class="pill warn">partial</span> — single <code>fetch(OPENROUTER_URL)</code> L28 ✓, but <code>temperature 0.3</code> vs <code>0.2</code>, <code>max_tokens 2000</code> vs <code>4000</code>, missing <code>response_format</code> + <code>HTTP-Referer</code>.</td><td><code>openrouter:36</code></td></tr>
+      <tr><td><code>src/schema.ts</code> — <code>validateDistillResult</code></td><td><code>validate.ts</code></td><td><span class="pill warn">renamed</span></td><td><span class="pill err">fail</span> — <strong>repairs</strong> (clamp, slice title, reassign rank) instead of <strong>rejecting</strong> with <code>issues[]</code>.</td><td>L44-99</td></tr>
+      <tr><td><code>src/clip.ts</code> — <code>ffmpeg -c copy</code> → re-encode fallback</td><td><code>steps/cut.ts</code></td><td><span class="pill warn">moved</span></td><td><span class="pill warn">partial</span> — copy ✓, but no <code>libx264/aac</code> fallback; one failure aborts all vs mark <code>ok:false</code>.</td><td>L23-37</td></tr>
+      <tr><td><code>src/counter.ts</code> — <code>RequestCounter</code></td><td><code>lib/budget.ts</code></td><td><span class="pill err">replaced</span></td><td><span class="pill err">fail</span> — <code>Budget</code> persists to <code>work/state.json</code>, increments <strong>after</strong> success not before fetch. No <code>budgetString()</code>.</td><td>L20-71</td></tr>
+      <tr><td><code>src/cli.ts</code></td><td><code>oxalpha/src/cli.ts</code></td><td><span class="pill ok">yes</span></td><td><span class="pill warn">partial</span> — <code>for await distill</code> ✓, but no <code>--out tmp</code>, no <code>Requests used: N/1000</code>, no <code>process.exit(1)</code>.</td><td>L9-44</td></tr>
+      <tr><td><code>src/server.ts</code> — SSE</td><td><code>oxalpha/src/server.ts</code></td><td><span class="pill ok">yes</span></td><td><span class="pill warn">partial</span> — <code>/events</code> not <code>/api/distill</code>; SSE <code>event: progress</code> for all vs <code>event: &lt;phase&gt;</code>.</td><td>L13,24</td></tr>
+      <tr><td><code>public/index.html</code></td><td><code>oxalpha/public/index.html</code></td><td><span class="pill ok">yes</span></td><td><span class="pill warn">partial</span> — single-file <code>EventSource</code> ✓, but single <code>progress</code> listener vs per-phase.</td><td>L55-97</td></tr>
+    </tbody>
+  </table>
+  <p class="small"><strong>Global nits:</strong> <code>.gitignore</code> uses <code>work/</code> not <code>tmp/</code>; <code>package.json</code> <code>bun-types</code> only ✓; <code>tsconfig strict</code> ✓.</p>
+
+  <!-- B -->
+  <h2 class="sec" id="json3">B) json3 parsing</h2>
+  <p><span class="pill ok">Partial Pass</span> — formula correct, skip logic correct, trimming correct.</p>
+  <table>
+    <thead><tr><th>Check</th><th>Plan §B</th><th>Oxalpha</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Absolute time</td><td><code>event.tStartMs + segment.tOffsetMs</code></td><td><code>Math.round(ev.tStartMs + (seg.tOffsetMs??0))</code> L33</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td>Skip header events</td><td><code>!segs → continue</code></td><td><code>if (!ev.segs) continue</code> L29</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td>Trim + keep</td><td><code>utf8.trim().length>0</code> per seg</td><td><code>replace(/\n/," ").trim()</code> L31</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td>Signature</td><td><code>parseJson3(raw:unknown): Transcript</code></td><td><code>parseJson3(raw:string)</code> L17 — caller did <code>Bun.file().text()</code> first</td><td><span class="pill warn">fail</span></td></tr>
+      <tr><td><code>endMs</code> inference</td><td><code>nextWord.startMs</code> or <code>tStartMs+dDurationMs</code></td><td>Only <code>startMs</code> stored; <code>groupSegments</code> invents <code>endMs = last startMs</code> L69 → zero-width last segment</td><td><span class="pill err">fail</span></td></tr>
+      <tr><td>Duration</td><td><code>last.endMs/1000</code></td><td>From <code>yt-dlp --print %(duration)s</code> L51, not parser</td><td><span class="pill warn">diverge</span></td></tr>
+      <tr><td>Chunking</td><td>~30s / ~80 words with <code>[mm:ss]</code></td><td>Sentence-boundary gap <code>>2000ms || endsSentence</code> L54-55; per-segment <code>[m:ss]</code> later</td><td><span class="pill warn">diverge</span></td></tr>
+      <tr><td>Truncate >800k</td><td>middle truncate with marker</td><td>None</td><td><span class="pill warn">missing</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- C -->
+  <h2 class="sec" id="single">C) Single request — message shape & schema</h2>
+  <div class="grid2">
+    <div class="card"><h4>What matches</h4><p>One <code>fetch(OPENROUTER_URL)</code> at <code>lib/openrouter.ts:28</code> ✓ · <code>MODEL_ID="minimax/minimax-m3:free"</code> + 2 fallbacks ✓ · Chain <code>[MODEL_ID,…FALLBACK]</code> ✓ · <code>AbortController</code> + 429 <code>Retry-After</code> sleep ✓</p></div>
+    <div class="card"><h4>What drifts</h4><p><code>temperature 0.3</code> vs <code>0.2</code> · <code>max_tokens 2000</code> vs <code>4000</code> · <strong>no</strong> <code>response_format: json_object</code> · no <code>HTTP-Referer</code> · system prompt <code>precise video analyst</code> vs plan's fixed distiller prompt · 120s vs 90s timeout</p></div>
+  </div>
+  <pre><code>Plan body: { model, messages:[system,user], temperature:0.2, max_tokens:4000, response_format:{type:"json_object"} }
+Oxalpha:   { model, messages:[system,user], temperature:0.3, max_tokens:2000 } // no response_format, no HTTP-Referer</code></pre>
+  <p class="small">Headers: oxalpha sends <code>Authorization + Content-Type + X-Title</code>; plan requires <code>HTTP-Referer + X-Title</code>. User prompt omits <code>duration: 47:12 (2832s), 8234 words</code> header and explicit JSON schema rules block — weaker but similar intent in system note.</p>
+
+  <!-- D -->
+  <h2 class="sec" id="validate">D) Validation & malformed output — <span style="color:var(--err)">Fail (repairs vs rejects)</span></h2>
+  <p>Plan §D: one request spent → validate strictly, fail loudly with <code>issues[]</code>, abort before <code>ffmpeg</code>. No silent repair.</p>
+  <table>
+    <thead><tr><th>Aspect</th><th>Plan (strict)</th><th>Oxalpha (clamp)</th></tr></thead>
+    <tbody>
+      <tr><td>Fence strip</td><td>regex <code>^```(?:json)?\s*|\s*```$</code></td><td><code>extractJson</code> brace-match L12-30 — more robust, OK</td></tr>
+      <tr><td>On bad JSON</td><td><code>ValidationError("invalid JSON", first 500 chars)</code></td><td>Throws only if missing <code>{</code> L7 — similar</td></tr>
+      <tr><td>Field checks</td><td>Accumulate <code>issues[]</code> per-field, <code>brief 80..800</code>, <code>moments 3..5</code>, <code>rank/title/reason</code> lengths, <code>15≤dur≤90</code>, <code>end≤duration</code>, ranks contiguous</td><td><code>continue</code> on missing, <code>s=Math.max(0,round)</code> L65, <code>e=min(duration)</code> L68, <code>e=s+MAX</code> L71, <code>e=s+MIN</code> L72, <code>title.slice(0,80)</code> L85, <code>rank=i+1</code> L92 — <strong>silently succeeds</strong> on malformed output, would cut wrong timestamps</td></tr>
+      <tr><td>Abort vs cut</td><td>Throw <code>ValidationError(issues)</code> → pipeline <code>analyze:error</code> before <code>ffmpeg</code></td><td>Only throws if <code>&lt;3</code> valid remain L93; otherwise proceeds to <code>cutMoments</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- E -->
+  <h2 class="sec" id="failure">E) Failure handling</h2>
+  <table>
+    <thead><tr><th>Failure</th><th>Plan</th><th>Oxalpha</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Missing <code>OPENROUTER_API_KEY</code></td><td><code>MissingKeyError</code> before any work, 0 cost, typed <code>code</code></td><td><code>ensureApiKey()</code> before DL ✓ 0 cost, but generic <code>Error</code> not typed</td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>yt-dlp failure</td><td><code>YtDlpError</code> sanitized <code>[redacted]</code></td><td><code>ShellError</code> with <code>stderr.slice(-800)</code>, no <code>[redacted]</code>, generic</td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>No captions</td><td><code>NoCaptionsError</code>, 0 cost</td><td>Generic <code>Error("no English captions")</code>, order caps-first ✓</td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>429</td><td>Fallback 2 models, <code>Retry-After</code>, counter reflects 1–3, <code>RateLimitedError</code></td><td>Fallback ✓, <code>Retry-After</code> capped &lt;30s ✓, but <strong>counter not incremented on 429</strong> (only after success)</td><td><span class="pill warn">partial fail</span></td></tr>
+      <tr><td>Timeout</td><td>90s <code>ModelTimeoutError</code>, no retry</td><td>120s, maps <code>AbortError→TimeoutError</code>, <strong>retries on timeout</strong> as fallback (plan says don't)</td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>ffmpeg</td><td><code>-c copy</code> → <code>libx264/aac</code> fallback, mark <code>ok:false</code> continue</td><td>Single <code>-c copy</code> only, one failure aborts all</td><td><span class="pill err">fail</span></td></tr>
+      <tr><td>Transcript too long</td><td>Truncate &gt;800k with marker</td><td>No guard</td><td><span class="pill warn">missing</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- F -->
+  <h2 class="sec" id="counter">F) Request counter</h2>
+  <pre><code>Plan:  class RequestCounter { increment():number // before each fetch (incl. fallbacks), value, budgetString(): "N/1000" }
+Oxalpha: class Budget { load(), record(), snapshot(): {runRequests,today,minute} } // persisted to work/state.json, record() after success only</code></pre>
+  <ul>
+    <li><strong>Timing bug:</strong> increments after <code>chat()</code> success L41, not before <code>fetch</code> → 429/timeout attempts undercounted (e.g., 429+success reports 1 not 2).</li>
+    <li><strong>Visibility:</strong> every <code>ProgressEvent</code> should carry <code>requestCount</code> — oxalpha splits into <code>request:start</code> (no count) / <code>request:end</code> (<code>runRequests/today/minute</code>). No per-event <code>requestCount</code>.</li>
+    <li><strong>Extra:</strong> daily/minute sliding window + <code>work/state.json</code> persistence exceeds plan's per-run counter (plan deferred cross-run tracking).</li>
+    <li>No <code>assert counter ≤3</code>.</li>
+  </ul>
+
+  <!-- G -->
+  <h2 class="sec" id="events">G) Progress events</h2>
+  <pre><code>Plan:  { phase: "download"|"transcribe"|"analyze"|"clip"|"done", status:"start"|"progress"|"done"|"error", message, percent?, requestCount, timestamp, result?, error? }
+Oxalpha: { type:"run:start"|"step:start"|"progress"|"request:start"|"request:end"|"request:fallback"|"brief:done"|"moment:done"|"done"|"error", step? }</code></pre>
+  <ul>
+    <li>Pipeline is <code>AsyncGenerator</code> via queue/notify ✓, but lacks <code>requestCount/timestamp</code>.</li>
+    <li>SSE: plan <code>event: ${ev.phase}</code> per phase; oxalpha <code>event: progress</code> for all L24 + client switches on <code>ev.type</code> — works internally, not plan-compliant.</li>
+    <li>CLI: plan prints <code>[phase:status] (req) … Requests used: N/1000</code>; oxalpha prints <code>→ model</code> / <code>← ok | budget: run=…today=…</code>, no final summary, no <code>process.exit(1)</code>.</li>
+  </ul>
+
+  <!-- H -->
+  <h2 class="sec" id="mvp">H) MVP cut line</h2>
+  <p><span class="pill ok">Pass</span> — all must-ship items present: scaffold, yt wrapper, json3 parser, validator, LLM+fallback, ffmpeg cutter, pipeline, CLI, server SSE, single-file UI. Explicitly deferred items absent (no auth/DB/caching/i18n/dnd/telemetry) — except lightweight <code>Budget</code> persistence which is a note-follow-up turned into feature.</p>
+  <p class="small">"Done at 90m" — CLI writes <code>work/&lt;id&gt;/clips/clip-*.mp4</code> (not <code>tmp/&lt;runId&gt;/clips</code>) but playable; server on <code>:8080</code> not <code>:3000</code> (config <code>SERVER_PORT</code>).</p>
+
+  <!-- Invariants -->
+  <h2 class="sec" id="invariants">Invariant checks</h2>
+  <table>
+    <thead><tr><th>Invariant</th><th>Expect</th><th>Oxalpha</th><th>Root (muse) ref</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td><code>grep -r "fetch" src/</code></td><td>1 × <code>src/llm.ts:1</code></td><td>1 OpenRouter <code>fetch</code> at <code>lib/openrouter.ts:28</code> (+ <code>Bun.serve fetch</code> handler, <code>fetchVideo</code> name)</td><td>1 at <code>src/llm.ts:39</code> (handler hidden via <code>["fet"+"ch"]</code>)</td><td><span class="pill ok">pass (functional)</span> · <span class="pill warn">path literal fail</span></td></tr>
+      <tr><td><code>grep -r "OPENROUTER_API_KEY"</code></td><td>only <code>src/config.ts:1</code></td><td><strong>only</strong> <code>lib/openrouter.ts:5</code> — wrong file</td><td>only <code>src/config.ts:1</code></td><td><span class="pill err">fail</span></td></tr>
+      <tr><td><code>grep -r "\bany\b"</code></td><td>0</td><td>0 type <code>any</code> (comment false positive only)</td><td>0</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td><code>ts-ignore</code></td><td>0 or explanatory comment</td><td>0</td><td>0</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td><code>bun.lock</code>, heavy deps</td><td>committed, no heavy deps</td><td><code>bun-types</code> only ✓</td><td><code>@types/bun</code> only ✓</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td><code>MODEL_ID</code> constant</td><td>single constant one-line switch</td><td><code>config:1</code> <code>minimax/m3:free</code> + fallbacks ✓</td><td>same</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td>Key never logged</td><td>no <code>console.log</code> of key</td><td>only <code>Authorization: Bearer</code> header, not logged; <code>work/state.json</code> has no key</td><td>same</td><td><span class="pill ok">pass</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- Gaps -->
+  <h2 class="sec" id="gaps">Gaps vs root (muse) reference</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>Root</th><th>Oxalpha</th><th>Gap</th></tr></thead>
+    <tbody>
+      <tr><td><code>config.ts</code></td><td><code>MODEL_ID</code> + <code>MissingKeyError</code> + <code>getApiKey()</code></td><td>constants only</td><td>Ownership drift</td></tr>
+      <tr><td>Counter</td><td><code>RequestCounter</code> per-run, before-fetch</td><td><code>Budget</code> persisted, after-success</td><td>Undercounts fallbacks</td></tr>
+      <tr><td><code>yt</code> → <code>fetch</code></td><td>1 composite <code>yt-dlp</code> call, <code>[redacted]</code> sanitize</td><td>3 calls, no sanitize</td><td>Extra spawn, missing sanitize</td></tr>
+      <tr><td>Transcript</td><td><code>raw:unknown</code>, <code>endMs=nextStart</code>, <code>800k</code> truncate</td><td><code>raw:string</code>, sentence-gap chunk, no truncate</td><td>Contract + guard</td></tr>
+      <tr><td>LLM body</td><td><code>temp 0.2, 4000, json_object, HTTP-Referer</code>, 90s</td><td><code>0.3,2000, no json_object, no Referer</code>, 120s</td><td>Request shape</td></tr>
+      <tr><td>Validation</td><td>strict <code>issues[]</code> → throw</td><td>clamp & reassign → succeed</td><td><strong>Most serious</strong></td></tr>
+      <tr><td>Clip</td><td><code>-c copy</code> → <code>libx264/aac</code> fallback</td><td>copy only, abort on fail</td><td>Resilience</td></tr>
+      <tr><td>Events/SSE</td><td><code>phase/status/requestCount</code>, <code>event:&lt;phase&gt;</code>, <code>/api/distill</code></td><td><code>type/step</code>, <code>event:progress</code>, <code>/events</code></td><td>Interop</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec" id="checklist">Checklist 1–16 crosswalk</h2>
+  <table>
+    <thead><tr><th>#</th><th>Item</th><th>Oxalpha</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Scaffold</td><td><span class="pill ok">pass</span></td></tr>
+      <tr><td>2</td><td><code>config.ts</code></td><td><span class="pill err">fail — moved key guard</span></td></tr>
+      <tr><td>3</td><td><code>types.ts</code></td><td><span class="pill warn">partial — renamed</span></td></tr>
+      <tr><td>4</td><td><code>counter.ts</code></td><td><span class="pill err">fail — Budget not Counter</span></td></tr>
+      <tr><td>5</td><td><code>yt.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>6</td><td><code>transcript.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>7</td><td><code>schema.ts</code></td><td><span class="pill err">fail — repairs</span></td></tr>
+      <tr><td>8</td><td><code>llm.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>9</td><td><code>clip.ts</code></td><td><span class="pill err">fail — no fallback</span></td></tr>
+      <tr><td>10</td><td><code>pipeline.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>11</td><td><code>cli.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>12</td><td><code>server.ts</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>13</td><td><code>public/index.html</code></td><td><span class="pill warn">partial</span></td></tr>
+      <tr><td>14</td><td>Invariants</td><td><span class="pill warn">partial — key path fails</span></td></tr>
+      <tr><td>15</td><td>E2E manual</td><td><span class="pill warn">partial — clip abort</span></td></tr>
+      <tr><td>16</td><td>Failure smokes</td><td><span class="pill warn">partial</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="card" style="margin-top:16px">
+    <h4>Bottom line vs muse plan</h4>
+    <p>Oxalpha keeps the <strong>one-fetch + shell-out + strict TS</strong> skeleton but rewrites the contracts (<code>Budget</code> vs <code>Counter</code>, <code>type</code> vs <code>phase/status</code>, <code>validate→clamp</code> vs <code>validate→reject</code>) and request shape (<code>response_format</code>, temps) so it is <strong>not drop-in compliant</strong> with <code>grep</code> + <code>validate</code> + <code>counter≤3</code> + <code>clip fallback</code> integration checks. Highest priority fix is <code>validate.ts</code> strict mode — everything downstream (clips, SSE, counter) depends on trustworthy timestamps.</p>
+  </div>
+
+  <footer>
+    Generated from read-only audit · <code class="mono">muse/plan.md</code> is source of truth · <code class="mono">oxalpha/src</code> 14 files · <code class="mono">muse/audit.html</code> is preview, not edited code.
+    <br>Files read: <code class="mono">oxalpha/src/config.ts, types.ts, pipeline.ts, cli.ts, server.ts, lib/openrouter.ts, lib/budget.ts, lib/shell.ts, steps/fetch.ts, transcript.ts, analyze.ts, cut.ts, validate.ts, public/index.html</code> + <code class="mono">src/*</code> reference.
+  </footer>
+</main>
+</body>
+</html>

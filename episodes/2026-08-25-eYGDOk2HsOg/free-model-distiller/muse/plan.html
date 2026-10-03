@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Distiller — Build Plan (Muse Spark)</title>
+<style>
+  :root{
+    --bg:#0b0c0f; --panel:#13151a; --panel2:#1a1d24; --border:#232734;
+    --text:#e6e8ee; --muted:#9aa0b2; --dim:#6b7280;
+    --accent:#7c5cff; --accent2:#3dd5a8; --warn:#f59e0b; --err:#ef4444;
+    --code-bg:#0f1116; --link:#8b7cff;
+    --radius:12px; --max:960px;
+  }
+  @media(prefers-color-scheme: light){
+    :root{
+      --bg:#f8f8fb; --panel:#ffffff; --panel2:#f1f2f6; --border:#e4e6ee;
+      --text:#0f1116; --muted:#5b6172; --dim:#8a90a6;
+      --accent:#6d28d9; --accent2:#059669; --code-bg:#f3f4f8; --link:#5b3df6;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:ui-sans, system-ui, -apple-system, Inter, Segoe UI, Roboto, Helvetica, Arial;
+    background:var(--bg); color:var(--text); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--link); text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{
+    position:sticky; top:0; z-index:10;
+    backdrop-filter:blur(12px);
+    background:color-mix(in srgb, var(--bg) 85%, transparent);
+    border-bottom:1px solid var(--border);
+  }
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px}
+  header .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 24px}
+  .brand{display:flex; align-items:center; gap:12px}
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--accent2); box-shadow:0 0 10px var(--accent2)}
+  .brand h1{font-size:15px; font-weight:700; margin:0; letter-spacing:-0.02em}
+  .brand p{margin:0; font-size:12px; color:var(--muted)}
+  .badge{font-size:12px; border:1px solid var(--border); background:var(--panel2); padding:6px 10px; border-radius:999px; color:var(--muted); white-space:nowrap}
+  .badge strong{color:var(--text)}
+  .hero{padding:32px 0 8px}
+  .hero h2{font-size:32px; line-height:1.15; letter-spacing:-0.03em; margin:0 0 8px}
+  .hero h2 span{color:var(--accent)}
+  .lead{color:var(--muted); font-size:15px; max-width:70ch}
+  .callouts{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0 28px}
+  @media(max-width:700px){ .callouts{grid-template-columns:1fr} }
+  .callout{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px}
+  .callout b{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent)}
+  .callout p{margin:6px 0 0; font-size:13px; color:var(--muted)}
+  .callout.warn b{color:var(--warn)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; margin:18px 0 28px}
+  .toc h3{margin:0 0 10px; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--dim)}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:32px}
+  @media(max-width:700px){ .toc ol{columns:1} }
+  .toc li{font-size:13px; margin:4px 0}
+  .toc a{color:var(--text)}
+  .toc a:hover{color:var(--accent)}
+  h2.sec{font-size:22px; letter-spacing:-0.02em; margin:36px 0 12px; padding-top:12px; border-top:1px solid var(--border)}
+  h3.sub{font-size:15px; margin:22px 0 10px; color:var(--text)}
+  h3.sub span{color:var(--muted); font-weight:500}
+  p, li{font-size:14px}
+  ul, ol{padding-left:22px}
+  li{margin:4px 0}
+  code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px}
+  p code, li code, td code{background:var(--code-bg); border:1px solid var(--border); padding:1px 6px; border-radius:6px; word-break:break-word}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; overflow:auto; font-size:13px; line-height:1.5}
+  pre code{border:none; padding:0; background:transparent}
+  table{width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:13px; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden}
+  th{background:var(--panel2); text-align:left; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--border)}
+  td{padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:3px 8px; border-radius:999px; border:1px solid var(--border); background:var(--panel2); color:var(--muted)}
+  .pill.accent{color:var(--accent); border-color:color-mix(in srgb, var(--accent) 30%, var(--border))}
+  .pill.ok{color:var(--accent2); border-color:color-mix(in srgb, var(--accent2) 30%, var(--border))}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media(max-width:700px){ .grid2{grid-template-columns:1fr} }
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px}
+  .card h4{margin:0 0 6px; font-size:13px}
+  .card p{margin:0; font-size:13px; color:var(--muted)}
+  blockquote{margin:12px 0; padding:12px 16px; background:var(--panel2); border-left:3px solid var(--accent); border-radius:0 var(--radius) var(--radius) 0; color:var(--muted); font-size:13px}
+  .kvs{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0}
+  .kv{font-size:12px; background:var(--panel2); border:1px solid var(--border); padding:6px 10px; border-radius:999px; color:var(--muted)}
+  .kv strong{color:var(--text)}
+  .checklist{counter-reset:step; list-style:none; padding:0}
+  .checklist li{counter-increment:step; position:relative; padding:12px 12px 12px 44px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); margin:8px 0}
+  .checklist li::before{content:counter(step); position:absolute; left:12px; top:12px; width:22px; height:22px; display:grid; place-items:center; background:var(--accent); color:white; font-size:12px; font-weight:700; border-radius:50%}
+  .checklist li strong{color:var(--text)}
+  .checklist li span{color:var(--muted)}
+  footer{margin:36px 0 40px; padding-top:16px; border-top:1px solid var(--border); color:var(--dim); font-size:12px}
+  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="dot" title="Muse active"></div>
+      <div>
+        <h1>YouTube Distiller <span style="font-weight:500; color:var(--muted)">— Build Plan</span></h1>
+        <p>Muse Spark · Bun · Strict TypeScript · One engine, two faces</p>
+      </div>
+    </div>
+    <div class="badge">Runtime: <strong>Muse Spark</strong> · kept, it's working</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h2>One engine <span>pipeline.ts</span>,<br>two faces — CLI + SSE</h2>
+    <p class="lead">Paste a YouTube link → get what the video actually said plus 3–5 ranked, playable moments. Free-tier invariant: <b style="color:var(--text)">exactly one model request per video</b>. Everything deterministic is a local tool — never a model call.</p>
+    <div class="kvs">
+      <span class="kv"><strong>Bun</strong> · bun.lock only</span>
+      <span class="kv"><strong>Strict TS</strong> · no <code>any</code></span>
+      <span class="kv"><strong>20/min · 1000/day</strong> · counted in requests</span>
+      <span class="kv"><strong>Single HTML</strong> · no React, no bundler</span>
+      <span class="kv"><strong>English only</strong></span>
+    </div>
+    <div class="callouts">
+      <div class="callout">
+        <b>Free-tier invariant</b>
+        <p>Processing one video must cost <strong style="color:var(--text)">exactly 1</strong> OpenRouter request. All other steps are local. The request counter is visible in every progress event, CLI and UI.</p>
+      </div>
+      <div class="callout warn">
+        <b>Hard constraint</b>
+        <p>20 req/min · 1000 req/day on <em>requests</em>, not tokens. Model id is a single constant in <code>src/config.ts:1</code> — one-line switch, never search-and-replace. Key: <code>OPENROUTER_API_KEY</code> — never logged, printed, or written.</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#a">A — File layout &amp; ownership</a></li>
+      <li><a href="#b">B — json3 parsing</a></li>
+      <li><a href="#c">C — The single request</a></li>
+      <li><a href="#d">D — Validation &amp; malformed output</a></li>
+      <li><a href="#e">E — Failure handling</a></li>
+      <li><a href="#f">F — Request counter</a></li>
+      <li><a href="#g">G — Progress events (CLI + SSE)</a></li>
+      <li><a href="#h">H — MVP cut line (90-min build)</a></li>
+      <li><a href="#checklist">Build checklist</a></li>
+    </ol>
+  </nav>
+
+  <!-- A -->
+  <h2 class="sec" id="a">A) File layout and what each file owns</h2>
+  <pre><code>openrouterfree/
+├── package.json              # Bun scripts, no npm. bun.lock committed.
+├── tsconfig.json             # strict: true, noImplicitAny, etc.
+├── bun.lock
+├── .gitignore                # tmp/, *.mp4, *.json3, .env
+├── src/
+│   ├── config.ts             # Single source of truth for model + env
+│   ├── types.ts              # Shared types (ProgressEvent, TranscriptWord, DistillResult, Moment)
+│   ├── pipeline.ts           # Engine — orchestrates 4 steps, emits ProgressEvents, owns RequestCounter
+│   ├── yt.ts                 # yt-dlp shell-out wrapper (download + captions)
+│   ├── transcript.ts         # json3 → WordTimedTranscript parser (pure, zero IO beyond file read)
+│   ├── llm.ts                # Single OpenRouter fetch + 429 fallback chain (the ONLY fetch to OpenRouter)
+│   ├── schema.ts             # Strict JSON validator: unknown → DistillResult type guard
+│   ├── clip.ts               # ffmpeg shell-out cutter
+│   ├── counter.ts            # RequestCounter class
+│   ├── cli.ts                # CLI face — subscribes to pipeline events, prints to terminal
+│   └── server.ts             # Server face — Bun.serve, SSE forwarder + static HTML + clip serving
+├── public/
+│   └── index.html            # Single static file. No React, no bundler. SSE client + clip player
+└── tmp/                      # Ephemeral per-run dir (gitignored): video.mp4, captions.json3, clips/</code></pre>
+
+  <table>
+    <thead><tr><th>File</th><th>Owns</th><th>Must NOT own</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/config.ts:1</code></td><td><code>MODEL_ID</code>, <code>FALLBACK_MODELS</code>, <code>getApiKey()</code> guard, <code>OPENROUTER_API_KEY</code> access</td><td>Any fetch or logging of the key</td></tr>
+      <tr><td><code>src/types.ts:1</code></td><td><code>ProgressEvent</code>, <code>TranscriptWord</code>, <code>Transcript</code>, <code>Moment</code>, <code>DistillResult</code></td><td>Runtime logic</td></tr>
+      <tr><td><code>src/pipeline.ts:1</code></td><td>Orchestration, AsyncGenerator of <code>ProgressEvent</code>, owns <code>RequestCounter</code>, temp-dir lifecycle</td><td>Direct <code>fetch</code> / <code>spawn</code> — delegates to <code>yt.ts</code>/<code>llm.ts</code>/<code>clip.ts</code></td></tr>
+      <tr><td><code>src/yt.ts:1</code></td><td><code>yt-dlp</code> spawn: download + captions, file discovery</td><td>Model calls, transcript parsing</td></tr>
+      <tr><td><code>src/transcript.ts:1</code></td><td>Pure <code>parseJson3(raw: unknown): Transcript</code></td><td>File IO, network</td></tr>
+      <tr><td><code>src/llm.ts:1</code></td><td>The <em>only</em> <code>fetch("https://openrouter.ai/api/v1/chat/completions")</code>, 429 fallback, timeout</td><td>Anything deterministic</td></tr>
+      <tr><td><code>src/schema.ts:1</code></td><td><code>validateDistillResult(raw: unknown): DistillResult</code> — type guards</td><td>Fetch, file IO</td></tr>
+      <tr><td><code>src/clip.ts:1</code></td><td><code>ffmpeg -ss start -to end -i input -c copy</code> (re-encode fallback)</td><td>Model calls</td></tr>
+      <tr><td><code>src/counter.ts:1</code></td><td><code>RequestCounter</code></td><td>Any other state</td></tr>
+      <tr><td><code>src/cli.ts:1</code></td><td>Arg parse, subscribes to events, pretty-prints</td><td>Server logic</td></tr>
+      <tr><td><code>src/server.ts:1</code></td><td><code>Bun.serve</code>, SSE endpoint, static serving</td><td>Pipeline orchestration</td></tr>
+      <tr><td><code>public/index.html:1</code></td><td>URL input, <code>EventSource</code>, renders brief + moments + video tags</td><td>Build step</td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--muted); font-size:13px"><strong style="color:var(--text)">Dependency budget:</strong> <code>zod</code> is acceptable if minimal, otherwise hand-rolled type guards. No other runtime deps. <code>yt-dlp</code> and <code>ffmpeg</code> are external binaries — checked via <code>which</code>/<code>spawn</code> at startup.</p>
+
+  <!-- B -->
+  <h2 class="sec" id="b">B) Exact json3 parsing approach</h2>
+  <h3 class="sub">json3 shape <span>— from <code>yt-dlp --sub-format json3</code></span></h3>
+  <pre><code class="language-json">{
+  "events": [
+    {
+      "tStartMs": 1240,
+      "dDurationMs": 3200,
+      "segs": [{ "utf8": "hello ", "tOffsetMs": 0 }, { "utf8": "world", "tOffsetMs": 400 }],
+      "wWinId": 1
+    }
+  ]
+}</code></pre>
+  <p>Source file is <code>tmp/&lt;id&gt;/*.en.json3</code> or <code>*.en.auto.json3</code>. Glob and pick the first match.</p>
+
+  <h3 class="sub">Algorithm <span>— <code>src/transcript.ts:1</code></span></h3>
+  <ol>
+    <li><strong>Read + JSON parse as <code>unknown</code>.</strong> Guard top-level has <code>events: unknown[]</code>, else throw <code>TranscriptParseError</code>.</li>
+    <li><strong>Iterate <code>events</code>.</strong> Skip where <code>segs</code> absent/null (header/formatting events with <code>tStartMs: 0</code>). Skip empty <code>segs</code>.</li>
+    <li><strong>Per segment:</strong> <code>absoluteMs = event.tStartMs + segment.tOffsetMs</code> — both integers; <code>tOffsetMs</code> is offset <em>within</em> the event. Do not use <code>dDurationMs</code>.</li>
+    <li><strong>Per word:</strong> <code>utf8</code> may have leading/trailing spaces and be a partial word. Emit one <code>TranscriptWord</code> per seg where <code>utf8.trim().length &gt; 0</code>:
+      <pre><code>{ text: seg.utf8.trim(), startMs: absoluteMs, endMs: /* nextWord.startMs or event.tStartMs+event.dDurationMs */ }</code></pre>
+      Infer <code>endMs</code> as <code>nextWord.startMs</code> (or event end for last seg) — conservative clip boundaries.
+    </li>
+    <li><strong>Collapse:</strong> <code>words: TranscriptWord[]</code> sorted by <code>startMs</code>; <code>fullText = words.map(w =&gt; w.text).join(" ")</code>; <code>durationSeconds = lastWord.endMs / 1000</code>.</li>
+    <li><strong>Timestamped transcript for LLM:</strong> chunk <code>words</code> into ~30s lines: <code>[00:12] hello world …</code> — derived from <code>startMs</code>, never model-generated.</li>
+    <li><strong>Edge cases:</strong> empty <code>events</code> → <code>NoCaptionsError</code>; file not found → <code>NoCaptionsError</code>; malformed JSON → <code>TranscriptParseError</code>. All local, zero model cost.</li>
+  </ol>
+  <div class="card"><h4>Parser output validation</h4><p><code>words.length &gt; 0</code>, monotonically increasing <code>startMs</code>, <code>durationSeconds &gt; 0</code>. Log word count + duration for debugging (never the key).</p></div>
+
+  <!-- C -->
+  <h2 class="sec" id="c">C) The single request — message shape &amp; JSON schema</h2>
+  <h3 class="sub">Config <span>— <code>src/config.ts:1</code></span></h3>
+  <pre><code class="language-ts">// Distiller LLM — single configurable constant (one-line switch).
+// Execution agent stays on Muse Spark (opencode/muse-spark-1.2-contributor-free) per runtime note.
+export const MODEL_ID = "minimax/minimax-m3:free" as const;
+export const FALLBACK_MODELS = [
+  "nvidia/nemotron-3.5-lightning:free",
+  "openrouter/free",
+] as const;</code></pre>
+  <p>One-line switch. <code>llm.ts</code> reads this constant; no other file references a model string. If Muse is available as an OpenRouter free route, swap <code>MODEL_ID</code> in one line — the execution agent remains Muse regardless.</p>
+
+  <h3 class="sub">Request shape <span>— <code>src/llm.ts:1</code></span></h3>
+  <ul>
+    <li><strong>Endpoint:</strong> <code>POST https://openrouter.ai/api/v1/chat/completions</code></li>
+    <li><strong>Headers:</strong> <code>Authorization: Bearer ${OPENROUTER_API_KEY}</code>, <code>Content-Type: application/json</code>, optional <code>HTTP-Referer</code> + <code>X-Title</code></li>
+    <li><strong>Body:</strong></li>
+  </ul>
+  <pre><code class="language-json">{
+  "model": "minimax/minimax-m3:free",
+  "messages": [
+    { "role": "system", "content": "&lt;system prompt — strict JSON, English only&gt;" },
+    { "role": "user",   "content": "&lt;transcript + output schema + rules&gt;" }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 4000,
+  "response_format": { "type": "json_object" }
+}</code></pre>
+  <p><code>response_format: json_object</code> forces JSON mode on routes that support it; prompt still demands raw JSON with no markdown fences as fallback.</p>
+  <blockquote><strong>System message (fixed):</strong> You are a YouTube distiller. You receive a full English transcript with [mm:ss] anchors. Return ONLY valid JSON matching the provided schema. No prose outside JSON, no markdown fences. English only. Moments within transcript duration, non-overlapping preferred, each 15–90s.</blockquote>
+  <pre><code>Transcript duration: 47:12 (2832s), 8234 words.
+Transcript:
+[00:00] ...
+[00:31] ...
+
+Task: produce JSON with:
+- brief: 3-6 sentence summary of what the video actually covers (not generic hype).
+- moments: 3-5 ranked highlights, each with startSeconds, endSeconds, title (hook, &lt;=60 chars), reason (1 sentence).
+
+Rules:
+- startSeconds/endSeconds are integers, 0 &lt;= start &lt; end &lt;= 2832, duration 15-90s.
+- Sorted by rank 1..N (1 = best).
+- No overlapping moments preferred; if unavoidable, keep &lt;5s overlap.
+- Return ONLY the JSON object.</code></pre>
+
+  <h3 class="sub">JSON Schema demanded back</h3>
+  <pre><code class="language-json">{
+  "type": "object",
+  "required": ["brief", "moments"],
+  "additionalProperties": false,
+  "properties": {
+    "brief": { "type": "string", "minLength": 80, "maxLength": 800 },
+    "moments": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["rank", "title", "reason", "startSeconds", "endSeconds"],
+        "additionalProperties": false,
+        "properties": {
+          "rank":         { "type": "integer", "minimum": 1, "maximum": 5 },
+          "title":        { "type": "string", "minLength": 5, "maxLength": 60 },
+          "reason":       { "type": "string", "minLength": 10, "maxLength": 200 },
+          "startSeconds": { "type": "integer", "minimum": 0 },
+          "endSeconds":   { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}</code></pre>
+  <p style="color:var(--muted); font-size:13px">Extra semantic checks in <code>schema.ts</code> (not JSON Schema): <code>start &lt; end</code>, <code>15 ≤ duration ≤ 90</code>, <code>end ≤ transcriptDurationSeconds</code>, <code>rank</code> contiguous <code>1..N</code>, non-empty titles/reasons.</p>
+
+  <!-- D -->
+  <h2 class="sec" id="d">D) Validation and what happens on malformed output</h2>
+  <p><span class="pill accent">Principle</span> One request already spent — do not spend a second to "fix" JSON. Validate strictly, fail loudly.</p>
+  <p><code>src/schema.ts:1</code> — <code>validateDistillResult(raw: unknown, durationSeconds: number): DistillResult</code></p>
+  <div class="grid2">
+    <div class="card">
+      <h4>1 · Pre-parse sanitization (local, zero cost)</h4>
+      <p>Trim string, strip <code>```json</code> / <code>```</code> fences via <code>^```(?:json)?\s*|\s*```$</code>, trim again. <code>JSON.parse</code> in try/catch — on <code>SyntaxError</code> throw <code>ValidationError</code> with first 500 chars (never the key).</p>
+    </div>
+    <div class="card">
+      <h4>2 · Structural validation (no <code>any</code>)</h4>
+      <p>Assert object, check <code>brief</code> string bounds, <code>moments</code> array <code>3..5</code>, per-moment field presence + <code>Number.isInteger</code> ranges, then semantic rules above.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h4>3 · On failure</h4>
+    <p>Throw <code>ValidationError</code> with <code>issues: string[]</code> (all violations). <code>pipeline.ts</code> emits <code>{ phase: "analyze", status: "error", issues }</code> and aborts before <code>ffmpeg</code>. CLI prints issues + hint: <em>retry costs 1 more request or change <code>MODEL_ID</code> in <code>config.ts:1</code></em>. SSE sends <code>event: error</code>; UI shows retry button. <strong style="color:var(--text)">No automatic retry that burns budget silently</strong> — retry is user-initiated only.</p>
+  </div>
+  <p style="margin-top:12px"><strong>4 · On success:</strong> return typed <code>DistillResult</code> and proceed to <code>clip.ts</code>.</p>
+
+  <!-- E -->
+  <h2 class="sec" id="e">E) Failure handling</h2>
+  <table>
+    <thead><tr><th>Failure</th><th>Detection</th><th>Handling</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Missing <code>OPENROUTER_API_KEY</code></strong></td><td><code>config.ts:getApiKey()</code> checks <code>process.env</code> at start</td><td>Throw <code>MissingKeyError</code> immediately; CLI prints <code>export OPENROUTER_API_KEY=…</code>; SSE <code>event: error</code>. Never log the key.</td><td><span class="pill ok">0</span></td></tr>
+      <tr><td><strong>yt-dlp failure</strong></td><td><code>spawn("yt-dlp")</code> non-zero, stderr <code>ERROR:</code></td><td>Throw <code>YtDlpError</code> (sanitized stderr), emit <code>download:error</code>, abort. Hint: check URL / <code>yt-dlp --version</code> / network.</td><td><span class="pill ok">0</span></td></tr>
+      <tr><td><strong>No captions</strong></td><td>No <code>*.json3</code> found, or no <code>en</code>/<code>en-auto</code></td><td>Throw <code>NoCaptionsError</code>. Advise: try another video. Do not call model.</td><td><span class="pill ok">0</span></td></tr>
+      <tr><td><strong>Rate limited 429</strong></td><td><code>fetch</code> status 429</td><td>Fallback chain: retry with <code>FALLBACK_MODELS[0]</code> then <code>[1]</code> (each a new request). Respect <code>Retry-After</code>. After all 429 → <code>RateLimitedError</code>. Counter shows actual fetches (e.g. 3).</td><td>1–3</td></tr>
+      <tr><td><strong>Model timeout</strong></td><td><code>AbortController</code> 90s</td><td>Abort → <code>ModelTimeoutError</code>. Do not auto-retry. Advise: retry or switch <code>MODEL_ID</code>.</td><td>1</td></tr>
+      <tr><td><strong>ffmpeg failure</strong></td><td><code>spawn("ffmpeg")</code> non-zero</td><td>Retry that clip with re-encode <code>-c:v libx264 -c:a aac</code> once; mark per-moment failed but continue others. Result: <code>clips: { moment, path, ok, error? }[]</code>.</td><td><span class="pill ok">0</span></td></tr>
+      <tr><td><strong>Transcript too long</strong></td><td>char/word count &gt; threshold</td><td>Warn; 47m ≈15K tokens is safe, 3h ≈60K still &lt;1M. If <code>&gt;800k</code> chars, truncate middle with <code>[…truncated…]</code>.</td><td>0–1</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Errors are typed (<code>MissingKeyError</code>, <code>YtDlpError</code>, <code>NoCaptionsError</code>, <code>ValidationError</code>, <code>RateLimitedError</code>, <code>ModelTimeoutError</code>, <code>ClipError</code>) so CLI/server can branch on code.</li>
+    <li>Never swallow errors — every <code>catch</code> re-emits as <code>ProgressEvent</code> with <code>status: "error"</code> and preserves <code>cause</code>.</li>
+    <li>Temp dir: left on failure for debugging unless <code>--clean</code>; server auto-cleans after 30m.</li>
+  </ul>
+
+  <!-- F -->
+  <h2 class="sec" id="f">F) Request counter — user always sees budget use</h2>
+  <pre><code class="language-ts">class RequestCounter {
+  private n = 0;
+  increment(): number { return ++this.n; }
+  get value(): number { return this.n; }
+  toString(): string { return `${this.n} request(s)`; }
+  budgetString(): string { return `${this.n}/1000 today (limit is requests, not tokens)`; }
+}</code></pre>
+  <ul>
+    <li><strong>Ownership:</strong> instantiated once in <code>pipeline.ts</code>, passed to <code>llm.ts</code>. Only <code>llm.ts</code> calls <code>increment()</code> — immediately before each <code>fetch</code> (including fallbacks).</li>
+    <li><strong>Visibility:</strong> every <code>ProgressEvent</code> carries <code>requestCount</code>. Final <code>done</code> event includes it. CLI prints <code>Requests used: 1/1000 (1 per video)</code> or <code>3/1000 (1 primary + 2 fallbacks)</code>. UI shows pill <code>● 1 request used — 999 remaining today</code> (estimate; true daily count on dashboard).</li>
+    <li><strong>Invariant:</strong> <code>pipeline.ts</code> asserts <code>counter.value ≤ 3</code> at end (1 primary + 2 fallbacks). If &gt;1 on success, warn — bug violating single-request design.</li>
+  </ul>
+
+  <!-- G -->
+  <h2 class="sec" id="g">G) Progress event shape — how CLI and SSE consume it</h2>
+  <h3 class="sub">Event type <span>— <code>src/types.ts:1</code></span></h3>
+  <pre><code class="language-ts">type PipelinePhase = "download" | "transcribe" | "analyze" | "clip" | "done";
+
+interface ProgressEvent {
+  phase: PipelinePhase;
+  status: "start" | "progress" | "done" | "error";
+  message: string;
+  percent?: number;         // 0–100
+  requestCount: number;
+  timestamp: number;        // Date.now()
+  result?: DistillResult &amp; { clips: ClipInfo[] }; // only done:done
+  error?: { code: string; details?: string; retryAfterSeconds?: number; issues?: string[] };
+}</code></pre>
+  <ul>
+    <li><code>pipeline.ts</code> exposes <code>async function* run(url: string): AsyncGenerator&lt;ProgressEvent&gt;</code> — preferred over EventEmitter for trivial forwarding.</li>
+    <li>Phases in order: <code>download:start → done → transcribe:start/done → analyze:start → done|error → clip:start → progress (per clip) → done → done:done</code></li>
+    <li>Only <code>analyze</code> may increment <code>requestCount</code>.</li>
+  </ul>
+  <div class="grid2">
+    <div class="card">
+      <h4>CLI <span style="color:var(--muted); font-weight:500">— <code>src/cli.ts:1</code></span></h4>
+      <pre style="margin-top:8px"><code>[download] start — fetching video + captions…
+[download] done — 47:12 video, captions found
+[transcribe] done — 8234 words
+[analyze] start — 1 request to minimax/m3:free (15K tokens)…
+[analyze] done — brief + 4 moments (1 request used)
+[clip] progress — cutting 1/4 "The hook title" [00:12–01:05]…
+[done] 4 clips ready in tmp/abc123/ — Requests used: 1/1000</code></pre>
+      <p>Loop: <code>for await (const ev of pipeline.run(url))</code>. ANSI colors manually (no heavy deps). On error → <code>stderr</code> + <code>process.exit(1)</code>.</p>
+    </div>
+    <div class="card">
+      <h4>SSE + UI <span style="color:var(--muted); font-weight:500">— <code>src/server.ts:1</code> + <code>public/index.html:1</code></span></h4>
+      <pre style="margin-top:8px"><code class="language-ts">Bun.serve({
+  port: 3000,
+  fetch(req){
+    if(url.pathname==="/api/distill"){
+      // text/event-stream, no-cache
+      // for await(ev of pipeline.run(url))
+      //   controller.enqueue(`event: ${ev.phase}\ndata: ${JSON.stringify(ev)}\n\n`)
+    }
+    if(url.pathname.startsWith("/clips/")) return new Response(Bun.file(...));
+    return new Response(Bun.file("public/index.html"));
+  }
+});</code></pre>
+      <pre style="margin-top:8px"><code class="language-js">const es = new EventSource(`/api/distill?url=${encodeURIComponent(url)}`);
+es.addEventListener("download", e =&gt; renderPhase(JSON.parse(e.data)));
+es.addEventListener("analyze", e =&gt; badge.textContent = `${JSON.parse(e.data).requestCount} request(s)`);
+es.addEventListener("done", e =&gt; { renderBrief(result.brief); renderClips(result.clips); es.close(); });
+es.addEventListener("error", e =&gt; { showError(JSON.parse(e.data)); es.close(); });</code></pre>
+      <p>Headers: <code>text/event-stream</code>, <code>Cache-Control: no-cache</code>, <code>Connection: keep-alive</code>. UI renders progressively: bar → stats → spinner → brief + <code>&lt;video controls&gt;</code> clips.</p>
+    </div>
+  </div>
+
+  <!-- H -->
+  <h2 class="sec" id="h">H) MVP cut line for a 90-minute live build</h2>
+  <p><span class="pill accent">Assumption</span> UI takes ~12 min and must not be cut. Leaves 78 min for the engine.</p>
+  <h3 class="sub">Must ship <span>— in build order</span></h3>
+  <div class="card">
+    <ol>
+      <li><strong>Project scaffold (5m):</strong> <code>bun init</code>, <code>tsconfig.json</code> strict, <code>.gitignore</code>, <code>src/config.ts:1</code> with <code>MODEL_ID</code>, <code>src/types.ts:1</code>, <code>src/counter.ts:1</code>.</li>
+      <li><strong>yt-dlp wrapper (10m):</strong> <code>src/yt.ts:1</code> — download + captions, temp dir, file discovery. Manual test with a known captioned video.</li>
+      <li><strong>json3 parser (10m):</strong> <code>src/transcript.ts:1</code> — pure function + tiny hand-crafted fixture. Verify <code>absoluteMs</code> formula.</li>
+      <li><strong>Schema validator (8m):</strong> <code>src/schema.ts:1</code> — <code>unknown</code> guards, bounds, fence stripping. Test good + malformed fixtures.</li>
+      <li><strong>LLM single request (15m):</strong> <code>src/llm.ts:1</code> — one <code>fetch</code>, <code>response_format: json_object</code>, 429 fallback, 90s timeout, counter.</li>
+      <li><strong>ffmpeg cutter (8m):</strong> <code>src/clip.ts:1</code> — <code>spawn</code>, <code>-ss</code>/<code>-to</code>, <code>copy</code> then re-encode fallback.</li>
+      <li><strong>Pipeline orchestration (10m):</strong> <code>src/pipeline.ts:1</code> — wires 1–6, <code>AsyncGenerator</code> events, error mapping.</li>
+      <li><strong>CLI face (5m):</strong> <code>src/cli.ts:1</code> — arg parse, event loop, pretty print, exit codes.</li>
+      <li><strong>Server face (7m):</strong> <code>src/server.ts:1</code> — <code>Bun.serve</code>, SSE endpoint, static serving.</li>
+      <li><strong>UI (12m):</strong> <code>public/index.html:1</code> — input, <code>EventSource</code>, progressive rendering, badge. No bundler.</li>
+    </ol>
+    <p style="color:var(--muted); font-size:13px; margin-top:10px">Total ~90m. Parallelize where possible (e.g., scaffold UI while <code>yt.ts</code> is tested).</p>
+  </div>
+
+  <h3 class="sub">Explicitly deferred <span>— not in MVP</span></h3>
+  <div class="card">
+    <ul>
+      <li>Auth, persistence, DB, user accounts</li>
+      <li>Caching of transcripts/results</li>
+      <li>Non-English captions / auto-translation / language detection</li>
+      <li>Clip re-encoding options, thumbnails, waveform</li>
+      <li>Drag-and-drop, paste-anywhere, keyboard shortcuts</li>
+      <li>Rate-limit pre-check / cross-run daily quota tracking</li>
+      <li>Retry-with-repair for malformed JSON (would cost a second request)</li>
+      <li>Tests beyond the two tiny fixtures (parser + validator)</li>
+      <li>Docker / deploy, CI</li>
+      <li>Additional model routes beyond two fallbacks</li>
+      <li>Analytics, logging to disk, telemetry</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">What "done" looks like at 90m</h3>
+  <ul>
+    <li><code>bun src/cli.ts "https://youtube.com/watch?v=…"</code> → brief + 3–5 moments, <code>tmp/&lt;id&gt;/clip-*.mp4</code> playable via <code>mpv</code>/<code>vlc</code>.</li>
+    <li><code>bun src/server.ts</code> → <code>http://localhost:3000</code> → paste link → live progress → brief + playable clips.</li>
+    <li><code>grep -r "fetch" src/</code> → exactly one call site (<code>src/llm.ts:1</code>).</li>
+    <li><code>grep -r "OPENROUTER_API_KEY" src/</code> → only <code>src/config.ts:1</code>.</li>
+    <li><code>grep -r "\bany\b" src/</code> → zero; <code>bun tsc --noEmit</code> passes strict.</li>
+  </ul>
+
+  <h2 class="sec" id="checklist">Build checklist</h2>
+  <ol class="checklist">
+    <li><strong>Scaffold repo</strong> <span>— <code>bun init</code>, <code>tsconfig.json</code> strict, <code>.gitignore</code> (<code>tmp/</code>, <code>*.mp4</code>, <code>*.json3</code>, <code>.env</code>), <code>bun.lock</code> committed, no <code>package-lock.json</code>.</span></li>
+    <li><strong><code>src/config.ts:1</code></strong> <span>— <code>MODEL_ID</code> + <code>FALLBACK_MODELS</code>, <code>getApiKey()</code> reading <code>process.env.OPENROUTER_API_KEY</code>, <code>MissingKeyError</code> if absent; never log/print/write the key.</span></li>
+    <li><strong><code>src/types.ts:1</code></strong> <span>— <code>ProgressEvent</code>, <code>TranscriptWord</code>, <code>Transcript</code>, <code>Moment</code>, <code>DistillResult</code>, <code>ClipInfo</code>, typed error classes.</span></li>
+    <li><strong><code>src/counter.ts:1</code></strong> <span>— <code>RequestCounter</code> with <code>increment()</code> called only from <code>llm.ts</code>; assert <code>counter.value ≤ 3</code> at end.</span></li>
+    <li><strong><code>src/yt.ts:1</code></strong> <span>— <code>yt-dlp</code> spawn for video + <code>--write-auto-sub --sub-lang en --sub-format json3</code>, temp dir + discovery, <code>YtDlpError</code>/<code>NoCaptionsError</code>.</span></li>
+    <li><strong><code>src/transcript.ts:1</code></strong> <span>— <code>parseJson3(unknown): Transcript</code> with <code>absoluteMs = tStartMs + tOffsetMs</code>, timing inference, tests with hand-crafted fixture.</span></li>
+    <li><strong><code>src/schema.ts:1</code></strong> <span>— <code>validateDistillResult(unknown, durationSeconds)</code> with fence stripping, type guards, <code>15–90s</code> bounds, <code>rank</code> contiguous, no <code>any</code>.</span></li>
+    <li><strong><code>src/llm.ts:1</code></strong> <span>— single <code>fetch</code> to <code>openrouter.ai/api/v1/chat/completions</code>, <code>response_format: json_object</code>, 90s <code>AbortController</code>, 429 fallback, counter increment before each fetch.</span></li>
+    <li><strong><code>src/clip.ts:1</code></strong> <span>— <code>ffmpeg -ss start -to end -i input -c copy</code> + re-encode fallback, per-clip <code>ClipInfo</code>.</span></li>
+    <li><strong><code>src/pipeline.ts:1</code></strong> <span>— <code>async function* run(url)</code> orchestrating download → transcribe → analyze → clip, emitting <code>ProgressEvent</code> with <code>requestCount</code>.</span></li>
+    <li><strong><code>src/cli.ts:1</code></strong> <span>— arg parse, <code>for await</code> over events, pretty output, <code>Requests used: N/1000</code> summary.</span></li>
+    <li><strong><code>src/server.ts:1</code></strong> <span>— <code>Bun.serve</code>, <code>GET /</code> → <code>public/index.html</code>, <code>GET /api/distill?url=</code> → SSE, <code>GET /clips/*</code> static.</span></li>
+    <li><strong><code>public/index.html:1</code></strong> <span>— single file, no bundler: input, <code>EventSource</code>, progressive phases, brief + moments + <code>&lt;video&gt;</code> clips, badge (12m, do not cut).</span></li>
+    <li><strong>Verify invariants</strong> <span>— <code>grep -r "fetch" src/</code> → one site; <code>OPENROUTER_API_KEY</code> → one file; <code>\bany\b</code> → zero; <code>bun tsc --noEmit</code> passes.</span></li>
+    <li><strong>Manual E2E test</strong> <span>— CLI with 5-minute video → 1 request, brief + clips playable; then server → browser → same result via SSE.</span></li>
+    <li><strong>Failure-path smoke tests</strong> <span>— missing key, bad URL, no captions, mocked 429, mocked timeout, malformed JSON — all typed errors, no extra spend.</span></li>
+  </ol>
+
+  <footer>
+    <div>Generated from <code class="mono">muse/plan.md</code> · Muse Spark (<code class="mono">opencode/muse-spark-1.2-contributor-free</code>) — runtime kept because it's working · <span class="mono">muse/plan.html</span> is gitignored preview, <span class="mono">muse/plan.md</span> is source of truth.</div>
+  </footer>
+</main>
+</body>
+</html>

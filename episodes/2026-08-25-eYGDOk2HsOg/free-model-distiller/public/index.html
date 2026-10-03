@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YouTube Distiller</title>
+<style>
+  :root{--bg:#0b0c0f;--panel:#13151a;--b:#232734;--t:#e6e8ee;--m:#9aa0b2;--a:#7c5cff;--ok:#3dd5a8}
+  *{box-sizing:border-box}body{margin:0;font-family:system-ui,Inter,sans-serif;background:var(--bg);color:var(--t);line-height:1.6}
+  .wrap{max-width:900px;margin:0 auto;padding:28px 20px}
+  h1{margin:0;font-size:26px;letter-spacing:-.03em}h1 span{color:var(--a)}.sub{color:var(--m);font-size:13px;margin:4px 0 18px}
+  .bar{display:flex;gap:10px;margin:16px 0}
+  input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--b);background:var(--panel);color:var(--t);font-size:14px}
+  button{padding:12px 18px;border-radius:10px;border:none;background:var(--a);color:white;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .pill{font-size:12px;border:1px solid var(--b);background:var(--panel);padding:6px 10px;border-radius:999px;color:var(--m);display:inline-block;margin:6px 6px 0 0}
+  .log{margin:16px 0;background:var(--panel);border:1px solid var(--b);border-radius:12px;padding:12px 14px;max-height:240px;overflow:auto;font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap}
+  .log .err{color:#f87171}.log .ok{color:var(--ok)}
+  .brief{background:var(--panel);border:1px solid var(--b);border-radius:12px;padding:16px;margin:14px 0}
+  .moments{display:grid;gap:12px;margin:12px 0}
+  .card{border:1px solid var(--b);background:var(--panel);border-radius:12px;padding:12px}
+  .card h3{margin:0 0 4px;font-size:14px}.card p{margin:0;color:var(--m);font-size:13px}
+  video{width:100%;border-radius:10px;margin-top:8px;background:black}
+  .badge{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--m);border:1px solid var(--b);background:#1a1d24;padding:3px 8px;border-radius:999px}
+</style>
+<div class="wrap">
+  <h1>YouTube <span>Distiller</span></h1>
+  <div class="sub">Paste a YouTube link → brief + 3–5 ranked moments, cut and playable. One model request per video.</div>
+  <div class="bar">
+    <input id="url" placeholder="https://www.youtube.com/watch?v=...">
+    <button id="go">Distill</button>
+  </div>
+  <div id="pills"></div>
+  <div id="log" class="log" hidden></div>
+  <div id="brief" class="brief" hidden></div>
+  <div id="moments" class="moments"></div>
+</div>
+<script>
+const $url=document.getElementById('url'), $go=document.getElementById('go'), $log=document.getElementById('log'), $brief=document.getElementById('brief'), $moments=document.getElementById('moments'), $pills=document.getElementById('pills');
+let es=null;
+function addLog(line,cls){ $log.hidden=false; const d=document.createElement('div'); d.textContent=line; if(cls) d.className=cls; $log.appendChild(d); $log.scrollTop=$log.scrollHeight; }
+function setPills(req,phase){ $pills.innerHTML=`<span class="pill">● ${req} request(s) — ${Math.max(0,1000-req)} left today (est.)</span><span class="pill">${phase}</span>`; }
+function fmt(s){ const m=Math.floor(s/60), sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+$go.onclick=()=>{
+  const u=$url.value.trim(); if(!u) return;
+  if(es) es.close();
+  $brief.hidden=true; $moments.innerHTML=''; $log.hidden=true; $log.innerHTML=''; $pills.innerHTML='';
+  $go.disabled=true; $go.textContent='Running…';
+  es=new EventSource(`/api/distill?url=${encodeURIComponent(u)}`);
+  const on=(phase,cb)=>es.addEventListener(phase, e=>{ try{ cb(JSON.parse(e.data)); }catch{}} );
+  ['download','transcribe','analyze','clip','done'].forEach(ph=>on(ph, ev=>{
+    setPills(ev.requestCount, `${ev.phase}:${ev.status}`);
+    if(ev.status==='error'){ addLog(`[${ev.phase}:${ev.status}] ${ev.message}`, 'err'); if(ev.error?.issues) ev.error.issues.forEach(i=>addLog('  - '+i,'err')); if(ev.error?.retryAfterSeconds) addLog(`  retry after ${ev.error.retryAfterSeconds}s`,'err'); }
+    else addLog(`[${ev.phase}:${ev.status}] ${ev.message}`, ev.status==='done'?'ok':'');
+    if(ev.phase==='done' && ev.status==='done' && ev.result){
+      $brief.hidden=false;
+      $brief.innerHTML=`<span class="badge">brief</span><p style="margin:8px 0 0">${ev.result.brief}</p><div style="margin-top:8px;color:#9aa0b2;font-size:12px">Duration ${fmt(ev.result.durationSeconds)} · ${ev.result.moments.length} moments · ${ev.requestCount} request(s) used</div>`;
+      $moments.innerHTML='';
+      ev.result.clips.forEach(c=>{
+        const m=ev.result.moments.find(x=>x.rank===c.rank);
+        const el=document.createElement('div'); el.className='card';
+        const src=c.ok?`/clips/${c.path.split('/tmp/')[1]}`:''; // server expects /clips/<runId>/clips/...
+        // fallback: server serves /clips/<rel> where rel is after tmp/
+        const rel=c.path.includes('/tmp/')?c.path.split('/tmp/')[1]:c.path;
+        el.innerHTML=`
+          <h3>#${c.rank} ${m?m.title:c.title} <span style="color:#9aa0b2;font-weight:500">[${fmt(c.startSeconds)}–${fmt(c.endSeconds)}]</span> ${c.ok?'<span style="color:#3dd5a8">● playable</span>':'<span style="color:#f87171">● failed</span>'}</h3>
+          <p>${m?m.reason:''}</p>
+          ${c.ok?`<video controls preload="metadata" src="/clips/${rel}"></video>`:`<div style="color:#f87171;font-size:12px;margin-top:6px">${(c.error||'ffmpeg failed').slice(0,300)}</div>`}
+        `;
+        $moments.appendChild(el);
+      });
+    }
+  }));
+  es.addEventListener('error', e=>{
+    // EventSource error is for connection; our app errors come as phase events with status:error
+    if(es.readyState===EventSource.CLOSED) { $go.disabled=false; $go.textContent='Distill'; }
+  });
+  // when stream ends, re-enable
+  const origClose=es.close.bind(es);
+  es.close=()=>{ origClose(); $go.disabled=false; $go.textContent='Distill'; };
+  // poll for close
+  const t=setInterval(()=>{ if(es.readyState===2){ clearInterval(t); $go.disabled=false; $go.textContent='Distill'; } },500);
+};
+</script>
+</html>
