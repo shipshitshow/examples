@@ -13,4 +13,4 @@ Public demonstration code and planning artifacts organized around their source l
 
 Each example records source, verification, required services/costs and reuse state. Historical model labels and claims are contextual. No live infrastructure is deployed by copying this repository. Raw recordings, native editing projects, private experiment folders, dependencies and environment files are excluded.
 
-Original repositories/history are preserved. Code license and third-party asset rights must be recorded before advertising unrestricted reuse; publication alone does not settle them. See [publication notes](PUBLICATION.md).
+Original repositories/history are preserved. Released under the [MIT License](LICENSE); third-party marks keep their own rights. See [publication notes](PUBLICATION.md).
